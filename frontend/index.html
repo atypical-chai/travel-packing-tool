@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Packing List</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✈️ Travel Packing & Trip Planning</h1>
+        </header>
+
+        <!-- Trip Details Form -->
+        <section class="trip-details">
+            <h2>Trip Details</h2>
+            <form id="tripForm">
+                <div class="form-group">
+                    <label for="destination">Destination:</label>
+                    <input type="text" id="destination" placeholder="e.g., Paris, France" required>
+                </div>
+                <div class="form-group">
+                    <label for="tripType">Trip Type:</label>
+                    <select id="tripType" required>
+                        <option value="">Select...</option>
+                        <option value="vacation">Vacation</option>
+                        <option value="business">Business</option>
+                        <option value="adventure">Adventure</option>
+                        <option value="family">Family</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="duration">Duration (days):</label>
+                    <input type="number" id="duration" min="1" placeholder="e.g., 7" required>
+                </div>
+                <button type="submit">Generate Checklist</button>
+            </form>
+        </section>
+
+        <!-- Checklist Container (hidden until trip details submitted) -->
+        <section class="checklist-container" id="checklistContainer" style="display: none;">
+            <div class="checklist-header">
+                <h2 id="tripSummary"></h2>
+                <button id="addSectionBtn" class="btn-secondary">+ Add Custom Item</button>
+            </div>
+
+            <!-- Three Main Sections -->
+            <div class="checklist-section" data-section="pack">
+                <div class="section-header">
+                    <input type="checkbox" id="pack-parent" class="parent-checkbox">
+                    <label for="pack-parent" class="section-title">📦 Things to Pack</label>
+                </div>
+                <ul class="checklist-items" id="pack-items">
+                    <!-- Child items will be added here by JavaScript -->
+                </ul>
+                <button class="add-item-btn" data-section="pack">+ Add item</button>
+            </div>
+
+            <div class="checklist-section" data-section="buy">
+                <div class="section-header">
+                    <input type="checkbox" id="buy-parent" class="parent-checkbox">
+                    <label for="buy-parent" class="section-title">🛒 Things to Buy</label>
+                </div>
+                <ul class="checklist-items" id="buy-items">
+                    <!-- Child items will be added here by JavaScript -->
+                </ul>
+                <button class="add-item-btn" data-section="buy">+ Add item</button>
+            </div>
+
+            <div class="checklist-section" data-section="do">
+                <div class="section-header">
+                    <input type="checkbox" id="do-parent" class="parent-checkbox">
+                    <label for="do-parent" class="section-title">✅ Things to Do</label>
+                </div>
+                <ul class="checklist-items" id="do-items">
+                    <!-- Child items will be added here by JavaScript -->
+                </ul>
+                <button class="add-item-btn" data-section="do">+ Add item</button>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
