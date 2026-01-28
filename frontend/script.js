@@ -35,6 +35,10 @@ const defaultItems = {
             winter: ['Warm jacket', 'Gloves', 'Scarf', 'Thermal layers'],
             autumn: ['Layers', 'Rain jacket', 'Closed shoes'],
             spring: ['Light jacket', 'Layers', 'Comfortable shoes']
+        },
+        byLocation: {
+            paris: ['Comfortable walking shoes', 'Light jacket', 'EU plug adapter'],
+            goa: ['Beachwear', 'Flip flops', 'Sunscreen', 'Insect repellent']
         }
     },
     buy: {
@@ -56,6 +60,10 @@ const defaultItems = {
             winter: ['Hand warmers', 'Lip balm'],
             autumn: ['Umbrella', 'Rain cover'],
             spring: ['Allergy meds', 'Sunscreen']
+        },
+        byLocation: {
+            paris: ['Museum pass', 'Metro card'],
+            goa: ['Sunscreen', 'Beach mat']
         }
     },
     do: {
@@ -77,6 +85,10 @@ const defaultItems = {
             winter: ['Check road conditions', 'Pack winter gear'],
             autumn: ['Check fall foliage timing'],
             spring: ['Check allergy season', 'Pack layers']
+        },
+        byLocation: {
+            paris: ['Book museum tickets', 'Check opening hours'],
+            goa: ['Check beach safety flags', 'Book scooter/car if needed']
         }
     }
 };
@@ -88,6 +100,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const restartBtn = document.getElementById('restartBtn');
     restartBtn.addEventListener('click', showRestartModal);
+    const restartBtnBottom = document.getElementById('restartBtnBottom');
+    restartBtnBottom.addEventListener('click', showRestartModal);
 
     document.getElementById('restartModalNo').addEventListener('click', hideRestartModal);
     document.getElementById('restartModalYes').addEventListener('click', confirmRestart);
@@ -106,6 +120,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadSavedData();
 });
+
+function getLocationKey(destination) {
+    const d = String(destination || '').trim().toLowerCase();
+    if (!d) return '';
+    if (d.includes('paris')) return 'paris';
+    if (d.includes('goa')) return 'goa';
+    return '';
+}
 
 // --- Restart flow ---
 function showRestartModal() {
@@ -193,21 +215,25 @@ function generateInitialChecklist() {
     const tt = tripData.tripType || 'leisure';
     const tw = tripData.travellingWith || [];
     const sea = tripData.season || 'summer';
+    const loc = getLocationKey(tripData.destination);
 
     const packArrays = [
         defaultItems.pack.byTripType[tt] || [],
         ...tw.map(w => defaultItems.pack.byTravellingWith[w] || []),
-        defaultItems.pack.bySeason[sea] || []
+        defaultItems.pack.bySeason[sea] || [],
+        (loc ? (defaultItems.pack.byLocation[loc] || []) : [])
     ];
     const buyArrays = [
         defaultItems.buy.byTripType[tt] || [],
         ...tw.map(w => defaultItems.buy.byTravellingWith[w] || []),
-        defaultItems.buy.bySeason[sea] || []
+        defaultItems.buy.bySeason[sea] || [],
+        (loc ? (defaultItems.buy.byLocation[loc] || []) : [])
     ];
     const doArrays = [
         defaultItems.do.byTripType[tt] || [],
         ...tw.map(w => defaultItems.do.byTravellingWith[w] || []),
-        defaultItems.do.bySeason[sea] || []
+        defaultItems.do.bySeason[sea] || [],
+        (loc ? (defaultItems.do.byLocation[loc] || []) : [])
     ];
 
     checklistData.pack = mergeAndDedupe(packArrays).map(text => ({ text, completed: false }));
