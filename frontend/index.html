@@ -24,16 +24,31 @@
                     <label for="tripType">Trip Type:</label>
                     <select id="tripType" required>
                         <option value="">Select...</option>
-                        <option value="vacation">Vacation</option>
-                        <option value="business">Business</option>
-                        <option value="adventure">Adventure</option>
-                        <option value="family">Family</option>
-                        <option value="other">Other</option>
+                        <option value="trek">Trek</option>
+                        <option value="leisure">Leisure</option>
+                        <option value="work">Work travel</option>
+                        <option value="backpacking">Backpacking</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="duration">Duration (days):</label>
-                    <input type="number" id="duration" min="1" placeholder="e.g., 7" required>
+                    <span class="label">Who are you travelling with?</span>
+                    <div class="checkbox-group" id="travellingWithGroup">
+                        <label class="checkbox-label"><input type="checkbox" name="travellingWith" value="solo"> Solo</label>
+                        <label class="checkbox-label"><input type="checkbox" name="travellingWith" value="withParents"> With parents</label>
+                        <label class="checkbox-label"><input type="checkbox" name="travellingWith" value="couple"> Couple</label>
+                        <label class="checkbox-label"><input type="checkbox" name="travellingWith" value="withKids"> With kids</label>
+                        <label class="checkbox-label"><input type="checkbox" name="travellingWith" value="withFriends"> With friends</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="season">Season of travelling:</label>
+                    <select id="season" required>
+                        <option value="">Select...</option>
+                        <option value="summer">Summer</option>
+                        <option value="winter">Winter</option>
+                        <option value="autumn">Autumn</option>
+                        <option value="spring">Spring</option>
+                    </select>
                 </div>
                 <button type="submit">Generate Checklist</button>
             </form>
@@ -42,8 +57,11 @@
         <!-- Checklist Container (hidden until trip details submitted) -->
         <section class="checklist-container" id="checklistContainer" style="display: none;">
             <div class="checklist-header">
-                <h2 id="tripSummary"></h2>
-                <button id="addSectionBtn" class="btn-secondary">+ Add Custom Item</button>
+                <div class="checklist-title-block">
+                    <h2 id="tripSummary"></h2>
+                    <p class="checklist-headnote" id="checklistHeadnote">We'll give you an exhaustive list of everything; feel free to delete the items that are not relevant to you.</p>
+                </div>
+                <button type="button" id="restartBtn" class="btn-restart">Restart</button>
             </div>
 
             <!-- Three Main Sections -->
@@ -52,9 +70,7 @@
                     <input type="checkbox" id="pack-parent" class="parent-checkbox">
                     <label for="pack-parent" class="section-title">📦 Things to Pack</label>
                 </div>
-                <ul class="checklist-items" id="pack-items">
-                    <!-- Child items will be added here by JavaScript -->
-                </ul>
+                <ul class="checklist-items" id="pack-items"></ul>
                 <button class="add-item-btn" data-section="pack">+ Add item</button>
             </div>
 
@@ -63,9 +79,7 @@
                     <input type="checkbox" id="buy-parent" class="parent-checkbox">
                     <label for="buy-parent" class="section-title">🛒 Things to Buy</label>
                 </div>
-                <ul class="checklist-items" id="buy-items">
-                    <!-- Child items will be added here by JavaScript -->
-                </ul>
+                <ul class="checklist-items" id="buy-items"></ul>
                 <button class="add-item-btn" data-section="buy">+ Add item</button>
             </div>
 
@@ -74,12 +88,31 @@
                     <input type="checkbox" id="do-parent" class="parent-checkbox">
                     <label for="do-parent" class="section-title">✅ Things to Do</label>
                 </div>
-                <ul class="checklist-items" id="do-items">
-                    <!-- Child items will be added here by JavaScript -->
-                </ul>
+                <ul class="checklist-items" id="do-items"></ul>
                 <button class="add-item-btn" data-section="do">+ Add item</button>
             </div>
         </section>
+    </div>
+
+    <!-- Restart confirmation modal -->
+    <div class="modal-overlay" id="restartModal" style="display: none;">
+        <div class="modal">
+            <p class="modal-message">The details of this trip will be lost. Are you sure you want to continue?</p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-modal btn-no" id="restartModalNo">No</button>
+                <button type="button" class="btn-modal btn-yes" id="restartModalYes">Yes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Congrats modal (all items done) -->
+    <div class="modal-overlay" id="congratsModal" style="display: none;">
+        <div class="modal">
+            <p class="modal-message modal-congrats">All the best for your trip!</p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-modal btn-ok" id="congratsModalOk">OK</button>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>

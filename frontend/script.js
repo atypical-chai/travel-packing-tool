@@ -2,7 +2,8 @@
 let tripData = {
     destination: '',
     tripType: '',
-    duration: 0
+    travellingWith: [],
+    season: ''
 };
 
 // Checklist data structure
@@ -12,28 +13,71 @@ let checklistData = {
     do: []
 };
 
-// Default items for each section (will be customized based on trip type)
+// Default items: each dimension adds items. Final list = merge + dedupe.
+// Keys: tripType (trek, leisure, work, backpacking), travellingWith (solo, withParents, couple, withKids, withFriends), season (summer, winter, autumn, spring)
 const defaultItems = {
     pack: {
-        vacation: ['Passport', 'Clothes', 'Toiletries', 'Phone charger', 'Camera'],
-        business: ['Laptop', 'Business cards', 'Formal clothes', 'Documents', 'Phone charger'],
-        adventure: ['Hiking boots', 'Backpack', 'First aid kit', 'Water bottle', 'Map'],
-        family: ['Diapers', 'Baby clothes', 'Toys', 'Snacks', 'Stroller'],
-        other: ['Essentials', 'Documents', 'Chargers', 'Clothes', 'Toiletries']
+        byTripType: {
+            trek: ['Hiking boots', 'Backpack', 'First aid kit', 'Water bottle', 'Map', 'Energy bars'],
+            leisure: ['Passport', 'Clothes', 'Toiletries', 'Phone charger', 'Camera', 'Sunscreen'],
+            work: ['Laptop', 'Business cards', 'Formal clothes', 'Documents', 'Phone charger'],
+            backpacking: ['Backpack', 'First aid kit', 'Water bottle', 'Quick-dry clothes', 'Headlamp']
+        },
+        byTravellingWith: {
+            solo: ['Portable charger', 'Travel adapter'],
+            withParents: ['Comfortable shoes', 'Medications list'],
+            couple: ['Camera', 'Travel adapter'],
+            withKids: ['Diapers', 'Baby clothes', 'Toys', 'Snacks', 'Stroller', 'Baby wipes'],
+            withFriends: ['Portable speaker', 'Games', 'Snacks']
+        },
+        bySeason: {
+            summer: ['Sunscreen', 'Hat', 'Light clothes', 'Sandals'],
+            winter: ['Warm jacket', 'Gloves', 'Scarf', 'Thermal layers'],
+            autumn: ['Layers', 'Rain jacket', 'Closed shoes'],
+            spring: ['Light jacket', 'Layers', 'Comfortable shoes']
+        }
     },
     buy: {
-        vacation: ['Travel adapter', 'Sunscreen', 'Travel guide', 'Snacks'],
-        business: ['Travel adapter', 'Notebook', 'Pens'],
-        adventure: ['Energy bars', 'Compass', 'Flashlight'],
-        family: ['Baby food', 'Diapers', 'Wipes'],
-        other: ['Travel essentials']
+        byTripType: {
+            trek: ['Energy bars', 'Compass', 'Flashlight', 'Trekking poles'],
+            leisure: ['Travel adapter', 'Sunscreen', 'Travel guide', 'Snacks'],
+            work: ['Travel adapter', 'Notebook', 'Pens'],
+            backpacking: ['Energy bars', 'Dry bags', 'Trekking poles']
+        },
+        byTravellingWith: {
+            solo: ['Travel guide'],
+            withParents: ['Comfort items'],
+            couple: ['Travel guide'],
+            withKids: ['Baby food', 'Diapers', 'Wipes', 'Snacks'],
+            withFriends: ['Snacks', 'Games']
+        },
+        bySeason: {
+            summer: ['Sunscreen', 'Insect repellent'],
+            winter: ['Hand warmers', 'Lip balm'],
+            autumn: ['Umbrella', 'Rain cover'],
+            spring: ['Allergy meds', 'Sunscreen']
+        }
     },
     do: {
-        vacation: ['Book flights', 'Reserve hotel', 'Check passport expiry', 'Get travel insurance'],
-        business: ['Book flights', 'Schedule meetings', 'Prepare presentation', 'Check visa requirements'],
-        adventure: ['Plan route', 'Check weather', 'Inform emergency contact', 'Pack first aid'],
-        family: ['Book family-friendly hotel', 'Plan activities', 'Pack baby essentials', 'Check vaccinations'],
-        other: ['Plan itinerary', 'Book accommodations', 'Check requirements']
+        byTripType: {
+            trek: ['Plan route', 'Check weather', 'Inform emergency contact', 'Pack first aid', 'Book permits'],
+            leisure: ['Book flights', 'Reserve hotel', 'Check passport expiry', 'Get travel insurance'],
+            work: ['Book flights', 'Schedule meetings', 'Prepare presentation', 'Check visa requirements'],
+            backpacking: ['Plan route', 'Check weather', 'Book hostels', 'Check visa']
+        },
+        byTravellingWith: {
+            solo: ['Share itinerary with someone'],
+            withParents: ['Check accessibility', 'Book direct flights'],
+            couple: ['Book flights', 'Reserve hotel'],
+            withKids: ['Book family-friendly hotel', 'Plan activities', 'Check vaccinations', 'Pack baby essentials'],
+            withFriends: ['Coordinate dates', 'Book accommodation']
+        },
+        bySeason: {
+            summer: ['Check heat advisories', 'Book AC accommodation'],
+            winter: ['Check road conditions', 'Pack winter gear'],
+            autumn: ['Check fall foliage timing'],
+            spring: ['Check allergy season', 'Pack layers']
+        }
     }
 };
 
@@ -42,63 +86,138 @@ document.addEventListener('DOMContentLoaded', () => {
     const tripForm = document.getElementById('tripForm');
     tripForm.addEventListener('submit', handleTripSubmit);
 
-    // Load saved data from localStorage if available
+    const restartBtn = document.getElementById('restartBtn');
+    restartBtn.addEventListener('click', showRestartModal);
+
+    document.getElementById('restartModalNo').addEventListener('click', hideRestartModal);
+    document.getElementById('restartModalYes').addEventListener('click', confirmRestart);
+    document.getElementById('congratsModalOk').addEventListener('click', hideCongratsModal);
+
+    // Single delegated listener for parent checkboxes (avoids duplicates after Restart)
+    document.getElementById('checklistContainer').addEventListener('change', (e) => {
+        if (e.target.classList.contains('parent-checkbox')) {
+            const id = e.target.id;
+            const sectionName = id.replace('-parent', '');
+            if (sectionName && ['pack', 'buy', 'do'].includes(sectionName)) {
+                toggleAllItems(sectionName, e.target.checked);
+            }
+        }
+    });
+
     loadSavedData();
 });
 
-// Handle trip form submission
-function handleTripSubmit(e) {
-    e.preventDefault();
-    
-    tripData.destination = document.getElementById('destination').value;
-    tripData.tripType = document.getElementById('tripType').value;
-    tripData.duration = parseInt(document.getElementById('duration').value);
-
-    // Show trip summary
-    const tripSummary = document.getElementById('tripSummary');
-    tripSummary.textContent = `${tripData.destination} • ${tripData.tripType} • ${tripData.duration} days`;
-
-    // Hide form and show checklist
-    document.querySelector('.trip-details').style.display = 'none';
-    document.getElementById('checklistContainer').style.display = 'block';
-
-    // Generate initial checklist items
-    generateInitialChecklist();
-
-    // Save to localStorage
-    saveData();
+// --- Restart flow ---
+function showRestartModal() {
+    document.getElementById('restartModal').style.display = 'flex';
 }
 
-// Generate initial checklist based on trip type
-function generateInitialChecklist() {
-    const tripType = tripData.tripType || 'other';
-    
-    // Clear existing items
+function hideRestartModal() {
+    document.getElementById('restartModal').style.display = 'none';
+}
+
+function confirmRestart() {
+    hideRestartModal();
+    tripData.destination = '';
+    tripData.tripType = '';
+    tripData.travellingWith = [];
+    tripData.season = '';
     checklistData.pack = [];
     checklistData.buy = [];
     checklistData.do = [];
+    document.getElementById('tripForm').reset();
+    document.querySelector('.trip-details').style.display = 'block';
+    document.getElementById('checklistContainer').style.display = 'none';
+    saveData();
+}
 
-    // Add default items for each section
-    defaultItems.pack[tripType].forEach(item => {
-        checklistData.pack.push({ text: item, completed: false });
-    });
+// --- Congrats modal (all items done) ---
+function showCongratsModal() {
+    document.getElementById('congratsModal').style.display = 'flex';
+}
 
-    defaultItems.buy[tripType].forEach(item => {
-        checklistData.buy.push({ text: item, completed: false });
-    });
+function hideCongratsModal() {
+    document.getElementById('congratsModal').style.display = 'none';
+}
 
-    defaultItems.do[tripType].forEach(item => {
-        checklistData.do.push({ text: item, completed: false });
-    });
+function checkAllItemsCompleted() {
+    const total = checklistData.pack.length + checklistData.buy.length + checklistData.do.length;
+    if (total === 0) return false;
+    const completed = checklistData.pack.filter(i => i.completed).length
+        + checklistData.buy.filter(i => i.completed).length
+        + checklistData.do.filter(i => i.completed).length;
+    return completed === total;
+}
 
-    // Render all sections
+// --- Form submission ---
+function handleTripSubmit(e) {
+    e.preventDefault();
+
+    tripData.destination = document.getElementById('destination').value.trim();
+    tripData.tripType = document.getElementById('tripType').value;
+    tripData.travellingWith = Array.from(document.querySelectorAll('input[name="travellingWith"]:checked')).map(cb => cb.value);
+    tripData.season = document.getElementById('season').value;
+
+    const summaryParts = [tripData.destination, tripData.tripType, tripData.season];
+    if (tripData.travellingWith.length > 0) {
+        summaryParts.splice(2, 0, tripData.travellingWith.join(', '));
+    }
+    const tripSummary = document.getElementById('tripSummary');
+    tripSummary.textContent = summaryParts.join(' • ');
+
+    document.querySelector('.trip-details').style.display = 'none';
+    document.getElementById('checklistContainer').style.display = 'block';
+
+    generateInitialChecklist();
+    saveData();
+}
+
+// Merge arrays and dedupe by string (case-insensitive, trim)
+function mergeAndDedupe(arrays) {
+    const seen = new Set();
+    const out = [];
+    for (const arr of arrays) {
+        for (const s of arr) {
+            const key = String(s).trim().toLowerCase();
+            if (key && !seen.has(key)) {
+                seen.add(key);
+                out.push(String(s).trim());
+            }
+        }
+    }
+    return out;
+}
+
+// Generate checklist from trip type + travelling with + season
+function generateInitialChecklist() {
+    const tt = tripData.tripType || 'leisure';
+    const tw = tripData.travellingWith || [];
+    const sea = tripData.season || 'summer';
+
+    const packArrays = [
+        defaultItems.pack.byTripType[tt] || [],
+        ...tw.map(w => defaultItems.pack.byTravellingWith[w] || []),
+        defaultItems.pack.bySeason[sea] || []
+    ];
+    const buyArrays = [
+        defaultItems.buy.byTripType[tt] || [],
+        ...tw.map(w => defaultItems.buy.byTravellingWith[w] || []),
+        defaultItems.buy.bySeason[sea] || []
+    ];
+    const doArrays = [
+        defaultItems.do.byTripType[tt] || [],
+        ...tw.map(w => defaultItems.do.byTravellingWith[w] || []),
+        defaultItems.do.bySeason[sea] || []
+    ];
+
+    checklistData.pack = mergeAndDedupe(packArrays).map(text => ({ text, completed: false }));
+    checklistData.buy = mergeAndDedupe(buyArrays).map(text => ({ text, completed: false }));
+    checklistData.do = mergeAndDedupe(doArrays).map(text => ({ text, completed: false }));
+
     renderSection('pack');
     renderSection('buy');
     renderSection('do');
-
-    // Set up event listeners for add buttons
     setupAddItemListeners();
-    setupParentCheckboxListeners();
 }
 
 // Render a checklist section
@@ -111,7 +230,6 @@ function renderSection(sectionName) {
         itemsList.appendChild(li);
     });
 
-    // Update parent checkbox state
     updateParentCheckbox(sectionName);
 }
 
@@ -150,6 +268,7 @@ function toggleItem(sectionName, index) {
     checklistData[sectionName][index].completed = !checklistData[sectionName][index].completed;
     renderSection(sectionName);
     saveData();
+    if (checkAllItemsCompleted()) showCongratsModal();
 }
 
 // Delete an item
@@ -163,7 +282,7 @@ function deleteItem(sectionName, index) {
 function updateParentCheckbox(sectionName) {
     const parentCheckbox = document.getElementById(`${sectionName}-parent`);
     const items = checklistData[sectionName];
-    
+
     if (items.length === 0) {
         parentCheckbox.checked = false;
         parentCheckbox.indeterminate = false;
@@ -171,7 +290,7 @@ function updateParentCheckbox(sectionName) {
     }
 
     const completedCount = items.filter(item => item.completed).length;
-    
+
     if (completedCount === 0) {
         parentCheckbox.checked = false;
         parentCheckbox.indeterminate = false;
@@ -180,18 +299,8 @@ function updateParentCheckbox(sectionName) {
         parentCheckbox.indeterminate = false;
     } else {
         parentCheckbox.checked = false;
-        parentCheckbox.indeterminate = true; // Some items completed
+        parentCheckbox.indeterminate = true;
     }
-}
-
-// Handle parent checkbox click
-function setupParentCheckboxListeners() {
-    ['pack', 'buy', 'do'].forEach(sectionName => {
-        const parentCheckbox = document.getElementById(`${sectionName}-parent`);
-        parentCheckbox.addEventListener('change', () => {
-            toggleAllItems(sectionName, parentCheckbox.checked);
-        });
-    });
 }
 
 // Toggle all items in a section
@@ -201,6 +310,7 @@ function toggleAllItems(sectionName, checked) {
     });
     renderSection(sectionName);
     saveData();
+    if (checkAllItemsCompleted()) showCongratsModal();
 }
 
 // Set up add item button listeners
@@ -215,7 +325,6 @@ function setupAddItemListeners() {
 
 // Show input field for adding new item
 function showAddItemInput(sectionName, button) {
-    // Remove any existing input
     const existingInput = document.querySelector(`.new-item-input[data-section="${sectionName}"]`);
     if (existingInput) {
         existingInput.remove();
@@ -227,7 +336,7 @@ function showAddItemInput(sectionName, button) {
     input.className = 'new-item-input';
     input.setAttribute('data-section', sectionName);
     input.placeholder = 'Enter item name...';
-    
+
     input.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && input.value.trim()) {
             addNewItem(sectionName, input.value.trim());
@@ -273,14 +382,23 @@ function loadSavedData() {
             tripData = data.tripData || tripData;
             checklistData = data.checklistData || checklistData;
 
-            // If we have saved data, show the checklist
+            if (!tripData.travellingWith) tripData.travellingWith = [];
+            if (!tripData.season) tripData.season = '';
+
             if (tripData.destination) {
                 document.getElementById('destination').value = tripData.destination;
-                document.getElementById('tripType').value = tripData.tripType;
-                document.getElementById('duration').value = tripData.duration;
+                document.getElementById('tripType').value = tripData.tripType || '';
+                document.getElementById('season').value = tripData.season || '';
+                const whoInputs = document.querySelectorAll('input[name="travellingWith"]');
+                whoInputs.forEach(inp => {
+                    inp.checked = (tripData.travellingWith || []).includes(inp.value);
+                });
 
-                const tripSummary = document.getElementById('tripSummary');
-                tripSummary.textContent = `${tripData.destination} • ${tripData.tripType} • ${tripData.duration} days`;
+                const summaryParts = [tripData.destination, tripData.tripType, tripData.season];
+                if ((tripData.travellingWith || []).length > 0) {
+                    summaryParts.splice(2, 0, tripData.travellingWith.join(', '));
+                }
+                document.getElementById('tripSummary').textContent = summaryParts.join(' • ');
 
                 document.querySelector('.trip-details').style.display = 'none';
                 document.getElementById('checklistContainer').style.display = 'block';
@@ -289,7 +407,6 @@ function loadSavedData() {
                 renderSection('buy');
                 renderSection('do');
                 setupAddItemListeners();
-                setupParentCheckboxListeners();
             }
         } catch (e) {
             console.error('Error loading saved data:', e);
