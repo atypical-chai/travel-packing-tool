@@ -6,92 +6,42 @@ let tripData = {
     season: ''
 };
 
-// Checklist data structure
+// Checklist data structure: just 3 lists. Content comes from backend (or hardcoded default for now).
 let checklistData = {
     pack: [],
     buy: [],
     do: []
 };
 
-// Default items: each dimension adds items. Final list = merge + dedupe.
-// Keys: tripType (trek, leisure, work, backpacking), travellingWith (solo, withParents, couple, withKids, withFriends), season (summer, winter, autumn, spring)
-const defaultItems = {
-    pack: {
-        byTripType: {
-            trek: ['Hiking boots', 'Backpack', 'First aid kit', 'Water bottle', 'Map', 'Energy bars'],
-            leisure: ['Passport', 'Clothes', 'Toiletries', 'Phone charger', 'Camera', 'Sunscreen'],
-            work: ['Laptop', 'Business cards', 'Formal clothes', 'Documents', 'Phone charger'],
-            backpacking: ['Backpack', 'First aid kit', 'Water bottle', 'Quick-dry clothes', 'Headlamp']
-        },
-        byTravellingWith: {
-            solo: ['Portable charger', 'Travel adapter'],
-            withParents: ['Comfortable shoes', 'Medications list'],
-            couple: ['Camera', 'Travel adapter'],
-            withKids: ['Diapers', 'Baby clothes', 'Toys', 'Snacks', 'Stroller', 'Baby wipes'],
-            withFriends: ['Portable speaker', 'Games', 'Snacks']
-        },
-        bySeason: {
-            summer: ['Sunscreen', 'Hat', 'Light clothes', 'Sandals'],
-            winter: ['Warm jacket', 'Gloves', 'Scarf', 'Thermal layers'],
-            autumn: ['Layers', 'Rain jacket', 'Closed shoes'],
-            spring: ['Light jacket', 'Layers', 'Comfortable shoes']
-        },
-        byLocation: {
-            paris: ['Comfortable walking shoes', 'Light jacket', 'EU plug adapter'],
-            goa: ['Beachwear', 'Flip flops', 'Sunscreen', 'Insect repellent']
-        }
-    },
-    buy: {
-        byTripType: {
-            trek: ['Energy bars', 'Compass', 'Flashlight', 'Trekking poles'],
-            leisure: ['Travel adapter', 'Sunscreen', 'Travel guide', 'Snacks'],
-            work: ['Travel adapter', 'Notebook', 'Pens'],
-            backpacking: ['Energy bars', 'Dry bags', 'Trekking poles']
-        },
-        byTravellingWith: {
-            solo: ['Travel guide'],
-            withParents: ['Comfort items'],
-            couple: ['Travel guide'],
-            withKids: ['Baby food', 'Diapers', 'Wipes', 'Snacks'],
-            withFriends: ['Snacks', 'Games']
-        },
-        bySeason: {
-            summer: ['Sunscreen', 'Insect repellent'],
-            winter: ['Hand warmers', 'Lip balm'],
-            autumn: ['Umbrella', 'Rain cover'],
-            spring: ['Allergy meds', 'Sunscreen']
-        },
-        byLocation: {
-            paris: ['Museum pass', 'Metro card'],
-            goa: ['Sunscreen', 'Beach mat']
-        }
-    },
-    do: {
-        byTripType: {
-            trek: ['Plan route', 'Check weather', 'Inform emergency contact', 'Pack first aid', 'Book permits'],
-            leisure: ['Book flights', 'Reserve hotel', 'Check passport expiry', 'Get travel insurance'],
-            work: ['Book flights', 'Schedule meetings', 'Prepare presentation', 'Check visa requirements'],
-            backpacking: ['Plan route', 'Check weather', 'Book hostels', 'Check visa']
-        },
-        byTravellingWith: {
-            solo: ['Share itinerary with someone'],
-            withParents: ['Check accessibility', 'Book direct flights'],
-            couple: ['Book flights', 'Reserve hotel'],
-            withKids: ['Book family-friendly hotel', 'Plan activities', 'Check vaccinations', 'Pack baby essentials'],
-            withFriends: ['Coordinate dates', 'Book accommodation']
-        },
-        bySeason: {
-            summer: ['Check heat advisories', 'Book AC accommodation'],
-            winter: ['Check road conditions', 'Pack winter gear'],
-            autumn: ['Check fall foliage timing'],
-            spring: ['Check allergy season', 'Pack layers']
-        },
-        byLocation: {
-            paris: ['Book museum tickets', 'Check opening hours'],
-            goa: ['Check beach safety flags', 'Book scooter/car if needed']
-        }
-    }
-};
+// Hardcoded default checklist until backend exists. When backend is ready, replace loadChecklist()
+// to call API with tripData and set checklistData from response: { pack, buy, do }.
+function getDefaultChecklist() {
+    return {
+        pack: [
+            'Passport', 'Clothes', 'Toiletries', 'Phone charger', 'Documents',
+            'Travel adapter', 'First aid kit', 'Comfortable shoes'
+        ].map(text => ({ text, completed: false })),
+        buy: [
+            'Travel adapter', 'Sunscreen', 'Travel guide', 'Snacks'
+        ].map(text => ({ text, completed: false })),
+        do: [
+            'Book flights', 'Reserve hotel', 'Check passport expiry', 'Get travel insurance'
+        ].map(text => ({ text, completed: false }))
+    };
+}
+
+// Load the 3 lists. TODO: replace with API call (e.g. POST /checklist with tripData, response = { pack, buy, do }).
+function loadChecklist() {
+    const defaultChecklist = getDefaultChecklist();
+    checklistData.pack = defaultChecklist.pack.map(item => ({ ...item }));
+    checklistData.buy = defaultChecklist.buy.map(item => ({ ...item }));
+    checklistData.do = defaultChecklist.do.map(item => ({ ...item }));
+
+    renderSection('pack');
+    renderSection('buy');
+    renderSection('do');
+    setupAddItemListeners();
+}
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
@@ -120,14 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadSavedData();
 });
-
-function getLocationKey(destination) {
-    const d = String(destination || '').trim().toLowerCase();
-    if (!d) return '';
-    if (d.includes('paris')) return 'paris';
-    if (d.includes('goa')) return 'goa';
-    return '';
-}
 
 // --- Restart flow ---
 function showRestartModal() {
@@ -190,60 +132,8 @@ function handleTripSubmit(e) {
     document.querySelector('.trip-details').style.display = 'none';
     document.getElementById('checklistContainer').style.display = 'block';
 
-    generateInitialChecklist();
+    loadChecklist();
     saveData();
-}
-
-// Merge arrays and dedupe by string (case-insensitive, trim)
-function mergeAndDedupe(arrays) {
-    const seen = new Set();
-    const out = [];
-    for (const arr of arrays) {
-        for (const s of arr) {
-            const key = String(s).trim().toLowerCase();
-            if (key && !seen.has(key)) {
-                seen.add(key);
-                out.push(String(s).trim());
-            }
-        }
-    }
-    return out;
-}
-
-// Generate checklist from trip type + travelling with + season
-function generateInitialChecklist() {
-    const tt = tripData.tripType || 'leisure';
-    const tw = tripData.travellingWith || [];
-    const sea = tripData.season || 'summer';
-    const loc = getLocationKey(tripData.destination);
-
-    const packArrays = [
-        defaultItems.pack.byTripType[tt] || [],
-        ...tw.map(w => defaultItems.pack.byTravellingWith[w] || []),
-        defaultItems.pack.bySeason[sea] || [],
-        (loc ? (defaultItems.pack.byLocation[loc] || []) : [])
-    ];
-    const buyArrays = [
-        defaultItems.buy.byTripType[tt] || [],
-        ...tw.map(w => defaultItems.buy.byTravellingWith[w] || []),
-        defaultItems.buy.bySeason[sea] || [],
-        (loc ? (defaultItems.buy.byLocation[loc] || []) : [])
-    ];
-    const doArrays = [
-        defaultItems.do.byTripType[tt] || [],
-        ...tw.map(w => defaultItems.do.byTravellingWith[w] || []),
-        defaultItems.do.bySeason[sea] || [],
-        (loc ? (defaultItems.do.byLocation[loc] || []) : [])
-    ];
-
-    checklistData.pack = mergeAndDedupe(packArrays).map(text => ({ text, completed: false }));
-    checklistData.buy = mergeAndDedupe(buyArrays).map(text => ({ text, completed: false }));
-    checklistData.do = mergeAndDedupe(doArrays).map(text => ({ text, completed: false }));
-
-    renderSection('pack');
-    renderSection('buy');
-    renderSection('do');
-    setupAddItemListeners();
 }
 
 // Render a checklist section
