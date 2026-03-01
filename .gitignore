@@ -20,5 +20,8 @@ Thumbs.db
 *.swo
 *~
 
+# Personal notes (local only)
+my_notes.md
+
 # Optional: uncomment if you use Node/npm for frontend tooling later
 # node_modules/

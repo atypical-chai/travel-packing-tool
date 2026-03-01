@@ -1,3 +1,6 @@
+// Backend API (ensure server is running: python3 -m uvicorn main:app --port 8000)
+const API_BASE_URL = 'http://127.0.0.1:8000';
+
 // Trip data storage
 let tripData = {
     destination: '',
@@ -30,13 +33,32 @@ function getDefaultChecklist() {
     };
 }
 
-// Load the 3 lists. TODO: replace with API call (e.g. POST /checklist with tripData, response = { pack, buy, do }).
-function loadChecklist() {
-    const defaultChecklist = getDefaultChecklist();
-    checklistData.pack = defaultChecklist.pack.map(item => ({ ...item }));
-    checklistData.buy = defaultChecklist.buy.map(item => ({ ...item }));
-    checklistData.do = defaultChecklist.do.map(item => ({ ...item }));
-
+// Load the 3 lists from backend API; on error fall back to hardcoded list.
+async function loadChecklist() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/generate-checklist`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                destination: tripData.destination,
+                tripType: tripData.tripType,
+                travellingWith: tripData.travellingWith,
+                season: tripData.season
+            })
+        });
+        if (!res.ok) throw new Error(`API ${res.status}`);
+        const data = await res.json();
+        checklistData.pack = data.pack || [];
+        checklistData.buy = data.buy || [];
+        checklistData.do = data.do || [];
+        console.log('Checklist loaded from backend: pack:', checklistData.pack.length, 'buy:', checklistData.buy.length, 'do:', checklistData.do.length);
+    } catch (e) {
+        console.warn('Backend not available, using default checklist:', e.message);
+        const defaultChecklist = getDefaultChecklist();
+        checklistData.pack = defaultChecklist.pack.map(item => ({ ...item }));
+        checklistData.buy = defaultChecklist.buy.map(item => ({ ...item }));
+        checklistData.do = defaultChecklist.do.map(item => ({ ...item }));
+    }
     renderSection('pack');
     renderSection('buy');
     renderSection('do');
@@ -132,8 +154,7 @@ function handleTripSubmit(e) {
     document.querySelector('.trip-details').style.display = 'none';
     document.getElementById('checklistContainer').style.display = 'block';
 
-    loadChecklist();
-    saveData();
+    loadChecklist().then(() => saveData());
 }
 
 // Render a checklist section
