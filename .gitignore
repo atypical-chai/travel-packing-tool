@@ -23,5 +23,10 @@ Thumbs.db
 # Personal notes (local only)
 my_notes.md
 
+# Debug / logs
+*.log
+debug.log
+debug*.log
+
 # Optional: uncomment if you use Node/npm for frontend tooling later
 # node_modules/
