@@ -1,5 +1,8 @@
-// Backend API (ensure server is running: python3 -m uvicorn main:app --port 8000)
-const API_BASE_URL = 'http://127.0.0.1:8000';
+// Backend API: local when served from localhost, otherwise deployed (Render)
+const API_BASE_URL =
+    (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+        ? 'http://127.0.0.1:8000'
+        : 'https://travel-packing-tool-backend.onrender.com';
 
 // Trip data storage
 let tripData = {

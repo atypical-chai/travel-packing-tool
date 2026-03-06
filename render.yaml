@@ -1,0 +1,9 @@
+# Render Blueprint: backend only (frontend deployed elsewhere e.g. Vercel)
+# See https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: travel-packing-tool-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
