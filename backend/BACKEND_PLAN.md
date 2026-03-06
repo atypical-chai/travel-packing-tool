@@ -735,7 +735,7 @@ File: `backend/database.py`
 **Key concepts to include:**
 - SQLite connection using Python's built-in `sqlite3` module
 - Table schema: id, name, category, tags (JSON)
-- Path to database: `../database/items.db`
+- Path to database: `database/items.db`
 
 **Test:**
 ```bash
@@ -743,7 +743,7 @@ File: `backend/database.py`
 python3 database.py
 
 # Check database file was created
-ls ../database/items.db  # Should exist but be empty (no items yet)
+ls database/items.db  # Should exist but be empty (no items yet)
 ```
 
 **Success Criteria:**
@@ -754,12 +754,12 @@ ls ../database/items.db  # Should exist but be empty (no items yet)
 
 **Expected Output:**
 ```
-Database initialized at: .../database/items.db
+Database initialized at: .../backend/database/items.db
 To seed the database with items, run: python3 items_data.py
 ```
 
 **Common Issues:**
-- "No such file or directory" → Database folder doesn't exist, create it: `mkdir ../database`
+- "No such file or directory" → Database folder doesn't exist, create it: `mkdir database`
 - Import errors → Check Python is installed correctly
 
 ---
@@ -812,10 +812,10 @@ python3 items_data.py
 **Verify Database Contents:**
 ```bash
 # Optional: If you have sqlite3 installed
-sqlite3 ../database/items.db "SELECT COUNT(*) FROM items_master;"
+sqlite3 database/items.db "SELECT COUNT(*) FROM items_master;"
 # Should return: 50 (or close to it)
 
-sqlite3 ../database/items.db "SELECT * FROM items_master LIMIT 5;"
+sqlite3 database/items.db "SELECT * FROM items_master LIMIT 5;"
 # Should show first 5 items
 ```
 

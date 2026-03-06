@@ -6,9 +6,9 @@ import json
 import os
 import sqlite3
 
-# Path to the database file: project/database/items.db (one level up from backend/)
+# Path to the database file: backend/database/items.db (inside backend/)
 _this_dir = os.path.dirname(os.path.abspath(__file__))
-DB_DIR = os.path.join(_this_dir, "..", "database")
+DB_DIR = os.path.join(_this_dir, "database")
 DB_PATH = os.path.join(DB_DIR, "items.db")
 
 
