@@ -49,3 +49,11 @@ def post_generate_checklist(body: TripDetailsRequest):
         season=body.season,
     )
     return ChecklistData(**result)
+
+
+if __name__ == "__main__":
+    """Run with: python main.py (reads PORT from env for Render)."""
+    import os
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
