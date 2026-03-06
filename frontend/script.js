@@ -315,6 +315,8 @@ function saveData() {
 
 // Load saved data from localStorage
 function loadSavedData() {
+    // Prevent initial "flash" of the form before we decide what to show.
+    // index.html starts with both sections hidden; we show the right one here.
     const saved = localStorage.getItem('travelPackingList');
     if (saved) {
         try {
@@ -347,9 +349,14 @@ function loadSavedData() {
                 renderSection('buy');
                 renderSection('do');
                 setupAddItemListeners();
+                return;
             }
         } catch (e) {
             console.error('Error loading saved data:', e);
         }
     }
+
+    // No saved trip (or failed to load) → show the form.
+    document.querySelector('.trip-details').style.display = 'block';
+    document.getElementById('checklistContainer').style.display = 'none';
 }
