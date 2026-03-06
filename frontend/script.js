@@ -38,6 +38,9 @@ function getDefaultChecklist() {
 
 // Load the 3 lists from backend API; on error fall back to hardcoded list.
 async function loadChecklist() {
+    const loadingEl = document.getElementById('checklistLoading');
+    if (loadingEl) loadingEl.style.display = 'block';
+
     try {
         const res = await fetch(`${API_BASE_URL}/api/generate-checklist`, {
             method: 'POST',
@@ -66,6 +69,8 @@ async function loadChecklist() {
     renderSection('buy');
     renderSection('do');
     setupAddItemListeners();
+
+    if (loadingEl) loadingEl.style.display = 'none';
 }
 
 // Initialize the app
@@ -105,6 +110,14 @@ function hideRestartModal() {
     document.getElementById('restartModal').style.display = 'none';
 }
 
+// Clear the checklist list DOM so we never show stale items (e.g. after Restart or while loading).
+function clearChecklistDOM() {
+    ['pack', 'buy', 'do'].forEach(section => {
+        const el = document.getElementById(`${section}-items`);
+        if (el) el.innerHTML = '';
+    });
+}
+
 function confirmRestart() {
     hideRestartModal();
     tripData.destination = '';
@@ -114,6 +127,7 @@ function confirmRestart() {
     checklistData.pack = [];
     checklistData.buy = [];
     checklistData.do = [];
+    clearChecklistDOM();
     document.getElementById('tripForm').reset();
     document.querySelector('.trip-details').style.display = 'block';
     document.getElementById('checklistContainer').style.display = 'none';
@@ -156,7 +170,7 @@ function handleTripSubmit(e) {
 
     document.querySelector('.trip-details').style.display = 'none';
     document.getElementById('checklistContainer').style.display = 'block';
-
+    clearChecklistDOM();
     loadChecklist().then(() => saveData());
 }
 

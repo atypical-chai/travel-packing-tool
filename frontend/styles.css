@@ -168,6 +168,17 @@ button[type="submit"]:hover,
     line-height: 1.4;
 }
 
+.checklist-loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: #667eea;
+    font-size: 1.1em;
+}
+
+.checklist-loading p {
+    margin: 0;
+}
+
 .btn-restart {
     background: transparent;
     color: #667eea;
