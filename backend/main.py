@@ -10,10 +10,15 @@ from list_generator import generate_checklist
 
 app = FastAPI(title="Travel Packing List API")
 
-# Allow frontend (e.g. Live Server on port 5500) to call this API
+# Allow frontend: local dev + Vercel production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5500", "http://127.0.0.1:5500", "null"],
+    allow_origins=[
+        "http://localhost:5500",
+        "http://127.0.0.1:5500",
+        "https://travel-packing-tool.vercel.app",
+        "null",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
