@@ -19,6 +19,9 @@ let checklistData = {
     do: []
 };
 
+// Collapsed state for "X completed items" block per section (default: collapsed).
+let completedBlockExpanded = { pack: false, buy: false, do: false };
+
 // Hardcoded default checklist until backend exists. When backend is ready, replace loadChecklist()
 // to call API with tripData and set checklistData from response: { pack, buy, do }.
 function getDefaultChecklist() {
@@ -68,13 +71,53 @@ async function loadChecklist() {
     renderSection('pack');
     renderSection('buy');
     renderSection('do');
-    setupAddItemListeners();
 
     if (loadingEl) loadingEl.style.display = 'none';
 }
 
+// --- Theme (dark / light): default dark, persist in same blob as checklist ---
+function initTheme() {
+    let theme = null;
+    const blob = localStorage.getItem('travelPackingList');
+    if (blob) {
+        try {
+            const data = JSON.parse(blob);
+            if (data.theme === 'light' || data.theme === 'dark') theme = data.theme;
+        } catch (_) {}
+    }
+    if (!theme) {
+        const standalone = localStorage.getItem('theme');
+        if (standalone === 'light' || standalone === 'dark') theme = standalone;
+    }
+    document.documentElement.setAttribute('data-theme', theme || 'dark');
+    updateThemeToggleUI();
+}
+
+function updateThemeToggleUI() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const toggles = document.querySelectorAll('.theme-toggle-switch');
+    toggles.forEach((el) => {
+        el.setAttribute('aria-checked', isDark ? 'true' : 'false');
+        el.setAttribute('title', isDark ? 'Dark mode' : 'Light mode');
+    });
+}
+
+function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateThemeToggleUI();
+    saveData();
+}
+
 // Initialize the app
 document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    document.querySelectorAll('.theme-toggle-switch').forEach((btn) => {
+        btn.addEventListener('click', toggleTheme);
+    });
+
     const tripForm = document.getElementById('tripForm');
     tripForm.addEventListener('submit', handleTripSubmit);
 
@@ -98,6 +141,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Delegated listener for add-item row (always-visible "+ List item" that expands to input)
+    document.getElementById('checklistContainer').addEventListener('click', (e) => {
+        const row = e.target.closest('.add-item-row');
+        if (!row || row.classList.contains('is-editing')) return;
+        e.preventDefault();
+        const sectionName = row.getAttribute('data-section');
+        if (sectionName && ['pack', 'buy', 'do'].includes(sectionName)) {
+            showAddItemInputInRow(row, sectionName);
+        }
+    });
+
+    document.getElementById('checklistContainer').addEventListener('keydown', (e) => {
+        const row = e.target.closest('.add-item-row');
+        if (!row) return;
+        const sectionName = row.getAttribute('data-section');
+
+        if (row.classList.contains('is-editing')) {
+            const input = row.querySelector('input.add-item-input');
+            if (!input) return;
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                finishAddItemInRow(row, input, sectionName);
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                restoreAddItemRow(row);
+            }
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (sectionName && ['pack', 'buy', 'do'].includes(sectionName)) {
+                showAddItemInputInRow(row, sectionName);
+            }
+        }
+    });
+
     loadSavedData();
 });
 
@@ -110,11 +187,13 @@ function hideRestartModal() {
     document.getElementById('restartModal').style.display = 'none';
 }
 
-// Clear the checklist list DOM so we never show stale items (e.g. after Restart or while loading).
+// Clear the checklist list DOM and completed blocks (e.g. after Restart or while loading).
 function clearChecklistDOM() {
     ['pack', 'buy', 'do'].forEach(section => {
-        const el = document.getElementById(`${section}-items`);
-        if (el) el.innerHTML = '';
+        const listEl = document.getElementById(`${section}-items`);
+        if (listEl) listEl.innerHTML = '';
+        const completedEl = document.getElementById(`${section}-completed`);
+        if (completedEl) completedEl.innerHTML = '';
     });
 }
 
@@ -127,6 +206,7 @@ function confirmRestart() {
     checklistData.pack = [];
     checklistData.buy = [];
     checklistData.do = [];
+    completedBlockExpanded = { pack: false, buy: false, do: false };
     clearChecklistDOM();
     document.getElementById('tripForm').reset();
     document.querySelector('.trip-details').style.display = 'block';
@@ -174,17 +254,60 @@ function handleTripSubmit(e) {
     loadChecklist().then(() => saveData());
 }
 
-// Render a checklist section
+// Render a checklist section: active items in the main list, completed in collapsible block.
 function renderSection(sectionName) {
+    const items = checklistData[sectionName];
+    const activeItems = items.map((item, index) => ({ item, index })).filter(({ item }) => !item.completed);
+    const completedItems = items.map((item, index) => ({ item, index })).filter(({ item }) => item.completed);
+
     const itemsList = document.getElementById(`${sectionName}-items`);
     itemsList.innerHTML = '';
-
-    checklistData[sectionName].forEach((item, index) => {
-        const li = createChecklistItem(sectionName, index, item.text, item.completed);
+    activeItems.forEach(({ item, index }) => {
+        const li = createChecklistItem(sectionName, index, item.text, false);
         itemsList.appendChild(li);
     });
 
+    renderCompletedBlock(sectionName, completedItems);
     updateParentCheckbox(sectionName);
+}
+
+// Render the "X completed items" collapsible block for a section.
+function renderCompletedBlock(sectionName, completedItems) {
+    const blockEl = document.getElementById(`${sectionName}-completed`);
+    if (!blockEl) return;
+
+    blockEl.innerHTML = '';
+    const count = completedItems.length;
+    if (count === 0) {
+        blockEl.classList.add('collapsed', 'is-empty');
+        return;
+    }
+
+    blockEl.classList.remove('is-empty');
+    const isExpanded = completedBlockExpanded[sectionName];
+    if (!isExpanded) blockEl.classList.add('collapsed');
+    else blockEl.classList.remove('collapsed');
+
+    const header = document.createElement('div');
+    header.className = 'completed-block-header';
+    header.setAttribute('role', 'button');
+    header.setAttribute('tabindex', '0');
+    header.setAttribute('aria-expanded', isExpanded);
+    header.innerHTML = `<span class="chevron" aria-hidden="true">▼</span><span>${count} completed item${count === 1 ? '' : 's'}</span>`;
+    header.addEventListener('click', () => {
+        completedBlockExpanded[sectionName] = !completedBlockExpanded[sectionName];
+        blockEl.classList.toggle('collapsed', !completedBlockExpanded[sectionName]);
+        header.setAttribute('aria-expanded', completedBlockExpanded[sectionName]);
+    });
+    blockEl.appendChild(header);
+
+    const list = document.createElement('ul');
+    list.className = 'completed-block-list';
+    completedItems.forEach(({ item, index }) => {
+        const li = createChecklistItem(sectionName, index, item.text, true);
+        list.appendChild(li);
+    });
+    blockEl.appendChild(list);
 }
 
 // Create a single checklist item element
@@ -267,48 +390,49 @@ function toggleAllItems(sectionName, checked) {
     if (checkAllItemsCompleted()) showCongratsModal();
 }
 
-// Set up add item button listeners
-function setupAddItemListeners() {
-    document.querySelectorAll('.add-item-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const sectionName = btn.getAttribute('data-section');
-            showAddItemInput(sectionName, btn);
-        });
-    });
-}
-
-// Show input field for adding new item
-function showAddItemInput(sectionName, button) {
-    const existingInput = document.querySelector(`.new-item-input[data-section="${sectionName}"]`);
-    if (existingInput) {
-        existingInput.remove();
-        return;
-    }
+// Show input inside the add-item row (Keep-style: row expands to input).
+function showAddItemInputInRow(row, sectionName) {
+    if (row.classList.contains('is-editing')) return;
+    row.classList.add('is-editing');
 
     const input = document.createElement('input');
     input.type = 'text';
-    input.className = 'new-item-input';
-    input.setAttribute('data-section', sectionName);
-    input.placeholder = 'Enter item name...';
-
-    input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && input.value.trim()) {
-            addNewItem(sectionName, input.value.trim());
-            input.remove();
-        } else if (e.key === 'Escape') {
-            input.remove();
-        }
-    });
+    input.className = 'add-item-input';
+    input.placeholder = 'List item';
+    input.setAttribute('aria-label', 'New item');
 
     input.addEventListener('blur', () => {
-        if (input.value.trim()) {
-            addNewItem(sectionName, input.value.trim());
-        }
-        input.remove();
+        finishAddItemInRow(row, input, sectionName);
     });
 
-    button.parentElement.insertBefore(input, button);
+    row.appendChild(input);
     input.focus();
+}
+
+function finishAddItemInRow(row, input, sectionName) {
+    if (!row.contains(input)) return; // avoid double-run from blur + Enter
+    const value = input.value.trim();
+    if (value) {
+        addNewItem(sectionName, value);
+    }
+    restoreAddItemRow(row);
+}
+
+function restoreAddItemRow(row) {
+    const input = row.querySelector('input.add-item-input');
+    if (input) input.remove();
+    row.classList.remove('is-editing');
+    // Restore placeholder if it was removed (e.g. by innerHTML elsewhere)
+    if (!row.querySelector('.add-item-text')) {
+        const icon = document.createElement('span');
+        icon.className = 'add-item-icon';
+        icon.textContent = '+';
+        const text = document.createElement('span');
+        text.className = 'add-item-text';
+        text.textContent = 'List item';
+        row.appendChild(icon);
+        row.appendChild(text);
+    }
 }
 
 // Add a new item to a section
@@ -318,11 +442,12 @@ function addNewItem(sectionName, text) {
     saveData();
 }
 
-// Save data to localStorage
+// Save data to localStorage (trip, checklist, and theme – same blob for persistence)
 function saveData() {
     const dataToSave = {
         tripData: tripData,
-        checklistData: checklistData
+        checklistData: checklistData,
+        theme: document.documentElement.getAttribute('data-theme')
     };
     localStorage.setItem('travelPackingList', JSON.stringify(dataToSave));
 }
@@ -337,6 +462,10 @@ function loadSavedData() {
             const data = JSON.parse(saved);
             tripData = data.tripData || tripData;
             checklistData = data.checklistData || checklistData;
+            if (data.theme === 'light' || data.theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', data.theme);
+                updateThemeToggleUI();
+            }
 
             if (!tripData.travellingWith) tripData.travellingWith = [];
             if (!tripData.season) tripData.season = '';
@@ -362,7 +491,6 @@ function loadSavedData() {
                 renderSection('pack');
                 renderSection('buy');
                 renderSection('do');
-                setupAddItemListeners();
                 return;
             }
         } catch (e) {
