@@ -338,12 +338,23 @@ function createChecklistItem(sectionName, index, text, completed) {
     checkbox.type = 'checkbox';
     checkbox.checked = completed;
     checkbox.addEventListener('change', () => {
-        toggleItem(sectionName, index);
+        if (checkbox.checked) {
+            li.classList.add('is-completing');
+            const duration = 400;
+            setTimeout(() => {
+                toggleItem(sectionName, index);
+            }, duration);
+        } else {
+            toggleItem(sectionName, index);
+        }
     });
 
     const label = document.createElement('span');
     label.className = 'item-label';
-    label.textContent = text;
+    const labelText = document.createElement('span');
+    labelText.className = 'item-label-text';
+    labelText.textContent = text;
+    label.appendChild(labelText);
 
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'item-delete';

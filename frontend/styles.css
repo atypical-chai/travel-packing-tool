@@ -477,6 +477,41 @@ button[type="submit"]:hover,
     color: var(--color-text-secondary);
 }
 
+/* Strikethrough animation when completing an item (line only over the text) */
+.item-label-text {
+    position: relative;
+    display: inline-block;
+}
+
+.checklist-item.is-completing .item-label {
+    color: var(--color-text-secondary);
+    transition: color 0.25s ease-out;
+}
+
+.checklist-item.is-completing .item-label-text::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 2px;
+    background: currentColor;
+    width: 0;
+    transition: width 0.35s ease-out;
+}
+
+.checklist-item.is-completing .item-label-text::after {
+    width: 100%;
+}
+
+/* During strikethrough, lock delete opacity so it doesn't change when checkbox gets focus */
+.checklist-item.is-completing .item-delete,
+.checklist-item.is-completing:hover .item-delete,
+.checklist-item.is-completing .item-delete:hover,
+.checklist-item.is-completing:focus-within .item-delete {
+    opacity: 0;
+    transition: none;
+}
+
 .checklist-item input[type="checkbox"] {
     width: 18px;
     height: 18px;
@@ -532,6 +567,12 @@ button[type="submit"]:hover,
     .checklist-item:focus-within .item-delete,
     .checklist-item .item-delete:focus {
         opacity: 1;
+    }
+    /* During strikethrough, keep delete at resting opacity (no change on tap) */
+    .checklist-item.is-completing .item-delete,
+    .checklist-item.is-completing:focus-within .item-delete {
+        opacity: 0.4;
+        transition: none;
     }
 }
 
