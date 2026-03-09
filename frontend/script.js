@@ -4,6 +4,15 @@ const API_BASE_URL =
         ? 'http://127.0.0.1:8000'
         : 'https://travel-packing-tool-backend.onrender.com';
 
+// Display labels for trip type (summary shows these, not raw values)
+const TRIP_TYPE_LABELS = { general: 'Vacation', work: 'Workation', outdoor: 'Adventure' };
+
+// Capitalize for display in trip summary (first letter of each part)
+function capitalizeForSummary(str) {
+    if (!str || typeof str !== 'string') return str;
+    return str.trim().replace(/\w\S*/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+}
+
 // Trip data storage (matches backend TripDetailsRequest)
 let tripData = {
     destination: '',
@@ -145,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Delegated listener for add-item row (always-visible "+ List item" that expands to input)
+    // Delegated listener for add-item row (always-visible "+ Add item" that expands to input)
     document.getElementById('checklistContainer').addEventListener('click', (e) => {
         const row = e.target.closest('.add-item-row');
         if (!row || row.classList.contains('is-editing')) return;
@@ -249,10 +258,12 @@ function handleTripSubmit(e) {
     tripData.activities = Array.from(document.querySelectorAll('input[name="activities"]:checked')).map(cb => cb.value);
     tripData.tripScope = document.getElementById('tripScope').value;
 
-    const summaryParts = [tripData.destination, tripData.tripType, tripData.tripScope];
-    if (tripData.weather.length > 0) summaryParts.push(tripData.weather.join(', '));
-    if (tripData.gear.length > 0) summaryParts.push(tripData.gear.join(', '));
-    if (tripData.activities.length > 0) summaryParts.push(tripData.activities.join(', '));
+    const tripTypeLabel = TRIP_TYPE_LABELS[tripData.tripType] || tripData.tripType;
+    const summaryParts = [
+        capitalizeForSummary(tripData.destination),
+        tripTypeLabel,
+        capitalizeForSummary(tripData.tripScope)
+    ];
     const tripSummary = document.getElementById('tripSummary');
     tripSummary.textContent = summaryParts.join(' • ');
 
@@ -336,7 +347,7 @@ function createChecklistItem(sectionName, index, text, completed) {
 
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'item-delete';
-    deleteBtn.textContent = 'Delete';
+    deleteBtn.textContent = 'Remove';
     deleteBtn.addEventListener('click', () => {
         deleteItem(sectionName, index);
     });
@@ -406,7 +417,7 @@ function showAddItemInputInRow(row, sectionName) {
     const input = document.createElement('input');
     input.type = 'text';
     input.className = 'add-item-input';
-    input.placeholder = 'List item';
+    input.placeholder = 'New item';
     input.setAttribute('aria-label', 'New item');
 
     input.addEventListener('blur', () => {
@@ -437,7 +448,7 @@ function restoreAddItemRow(row) {
         icon.textContent = '+';
         const text = document.createElement('span');
         text.className = 'add-item-text';
-        text.textContent = 'List item';
+        text.textContent = 'Add item';
         row.appendChild(icon);
         row.appendChild(text);
     }
@@ -489,10 +500,12 @@ function loadSavedData() {
                     inputs.forEach(inp => { inp.checked = values.includes(inp.value); });
                 });
 
-                const summaryParts = [tripData.destination, tripData.tripType, tripData.tripScope];
-                if ((tripData.weather || []).length > 0) summaryParts.push(tripData.weather.join(', '));
-                if ((tripData.gear || []).length > 0) summaryParts.push(tripData.gear.join(', '));
-                if ((tripData.activities || []).length > 0) summaryParts.push(tripData.activities.join(', '));
+                const tripTypeLabel = TRIP_TYPE_LABELS[tripData.tripType] || tripData.tripType;
+                const summaryParts = [
+                    capitalizeForSummary(tripData.destination),
+                    tripTypeLabel,
+                    capitalizeForSummary(tripData.tripScope)
+                ];
                 document.getElementById('tripSummary').textContent = summaryParts.join(' • ');
 
                 document.querySelector('.trip-details').style.display = 'none';

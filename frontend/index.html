@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Travel Packing List</title>
+    <title>Travel Checklist</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12,7 +12,10 @@
 <body>
     <div class="container">
         <header>
-            <h1>✈️ Travel Packing & Trip Planning</h1>
+            <div class="header-title-block">
+                <h1>✈️ Travel Checklist</h1>
+                <p class="header-intro">Get a travel checklist built for your trip, so you don't forget the essentials.</p>
+            </div>
             <div class="theme-toggle-wrap">
                 <span class="theme-toggle-label" aria-hidden="true">☀</span>
                 <button type="button" id="themeToggle" class="theme-toggle-switch" role="switch" aria-label="Toggle dark mode" aria-checked="true" title="Dark mode">
@@ -26,23 +29,23 @@
 
         <!-- Trip Details Form (hidden until JS decides what to show) -->
         <section class="trip-details" style="display: none;">
-            <h2>Trip Details</h2>
+            <h2>Trip details</h2>
             <form id="tripForm">
                 <div class="form-group">
-                    <label for="destination">Destination:</label>
-                    <input type="text" id="destination" placeholder="e.g., Paris, Goa" required>
+                    <label for="destination">Destination</label>
+                    <input type="text" id="destination" placeholder="e.g. Paris, Goa" required>
                 </div>
                 <div class="form-group">
                     <label for="tripType">What kind of trip is this?</label>
                     <select id="tripType" required>
                         <option value="">Select...</option>
-                        <option value="general">General trip</option>
+                        <option value="general">Vacation</option>
                         <option value="work">Workation</option>
-                        <option value="outdoor">Adventure / trek</option>
+                        <option value="outdoor">Adventure</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <span class="label">What weather do you expect? (tick all that apply)</span>
+                    <span class="label">Expected weather</span>
                     <div class="checkbox-group" id="weatherGroup">
                         <label class="checkbox-label"><input type="checkbox" name="weather" value="hot"> Hot</label>
                         <label class="checkbox-label"><input type="checkbox" name="weather" value="cold"> Cold</label>
@@ -51,30 +54,30 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <span class="label">What extra gear are you carrying? (tick all that apply)</span>
+                    <span class="label">Extra gear</span>
                     <div class="checkbox-group" id="gearGroup">
                         <label class="checkbox-label"><input type="checkbox" name="gear" value="laptop"> Laptop</label>
                         <label class="checkbox-label"><input type="checkbox" name="gear" value="camera"> Camera gear</label>
                     </div>
                 </div>
                 <div class="form-group">
-                    <span class="label">Any planned activities? (tick all that apply)</span>
+                    <span class="label">Planned activities</span>
                     <div class="checkbox-group" id="activitiesGroup">
-                        <label class="checkbox-label"><input type="checkbox" name="activities" value="beach"> Water activities (e.g. pool, beach)</label>
-                        <label class="checkbox-label"><input type="checkbox" name="activities" value="fitness"> Workout (e.g. run, gym)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="activities" value="beach"> Beach / pool</label>
+                        <label class="checkbox-label"><input type="checkbox" name="activities" value="fitness"> Workout</label>
                         <label class="checkbox-label"><input type="checkbox" name="activities" value="roadtrip"> Road trip</label>
-                        <label class="checkbox-label"><input type="checkbox" name="activities" value="downtime"> Downtime (e.g. reading, journaling)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="activities" value="downtime"> Reading / downtime</label>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="tripScope">Is this a domestic or international trip?</label>
+                    <label for="tripScope">Domestic or international?</label>
                     <select id="tripScope" required>
                         <option value="">Select...</option>
                         <option value="domestic">Domestic</option>
                         <option value="international">International</option>
                     </select>
                 </div>
-                <button type="submit">Generate Checklist</button>
+                <button type="submit">Create checklist</button>
             </form>
         </section>
 
@@ -83,25 +86,26 @@
             <div class="checklist-header">
                 <div class="checklist-title-block">
                     <h2 id="tripSummary"></h2>
-                    <p class="checklist-headnote" id="checklistHeadnote">We'll give you an exhaustive list of everything; feel free to delete the items that are not relevant to you.</p>
+                    <p class="checklist-headnote" id="checklistHeadnote">Start with this list and remove anything you don't need.</p>
                 </div>
-                <button type="button" id="restartBtn" class="btn-restart">Restart</button>
+                <button type="button" id="restartBtn" class="btn-restart">Start over</button>
             </div>
 
             <div class="checklist-loading" id="checklistLoading" style="display: none;">
-                <p>Loading your checklist…</p>
+                <p>Building your checklist</p>
+                <p class="checklist-loading-helper">This should be ready in under 30 seconds.</p>
             </div>
 
             <!-- Three Main Sections -->
             <div class="checklist-section" data-section="pack">
                 <div class="section-header">
                     <input type="checkbox" id="pack-parent" class="parent-checkbox">
-                    <label for="pack-parent" class="section-title">Things to Pack</label>
+                    <label for="pack-parent" class="section-title">Pack</label>
                 </div>
                 <ul class="checklist-items" id="pack-items"></ul>
                 <div class="add-item-row" data-section="pack" tabindex="0" role="button">
                     <span class="add-item-icon">+</span>
-                    <span class="add-item-text">List item</span>
+                    <span class="add-item-text">Add item</span>
                 </div>
                 <div class="completed-block" id="pack-completed" data-section="pack"></div>
             </div>
@@ -109,12 +113,12 @@
             <div class="checklist-section" data-section="buy">
                 <div class="section-header">
                     <input type="checkbox" id="buy-parent" class="parent-checkbox">
-                    <label for="buy-parent" class="section-title">Things to Buy</label>
+                    <label for="buy-parent" class="section-title">Buy</label>
                 </div>
                 <ul class="checklist-items" id="buy-items"></ul>
                 <div class="add-item-row" data-section="buy" tabindex="0" role="button">
                     <span class="add-item-icon">+</span>
-                    <span class="add-item-text">List item</span>
+                    <span class="add-item-text">Add item</span>
                 </div>
                 <div class="completed-block" id="buy-completed" data-section="buy"></div>
             </div>
@@ -122,27 +126,28 @@
             <div class="checklist-section" data-section="do">
                 <div class="section-header">
                     <input type="checkbox" id="do-parent" class="parent-checkbox">
-                    <label for="do-parent" class="section-title">Things to Do</label>
+                    <label for="do-parent" class="section-title">Before you go</label>
                 </div>
                 <ul class="checklist-items" id="do-items"></ul>
                 <div class="add-item-row" data-section="do" tabindex="0" role="button">
                     <span class="add-item-icon">+</span>
-                    <span class="add-item-text">List item</span>
+                    <span class="add-item-text">Add item</span>
                 </div>
                 <div class="completed-block" id="do-completed" data-section="do"></div>
             </div>
 
-            <button type="button" id="restartBtnBottom" class="btn-restart btn-restart-full">Restart</button>
+            <button type="button" id="restartBtnBottom" class="btn-restart btn-restart-full">Start over</button>
         </section>
     </div>
 
     <!-- Restart confirmation modal -->
     <div class="modal-overlay" id="restartModal" style="display: none;">
         <div class="modal">
-            <p class="modal-message">The details of this trip will be lost. Are you sure you want to continue?</p>
+            <p class="modal-title">Start over?</p>
+            <p class="modal-message">Your current trip details and checklist will be cleared.</p>
             <div class="modal-buttons">
-                <button type="button" class="btn-modal btn-no" id="restartModalNo">No</button>
-                <button type="button" class="btn-modal btn-yes" id="restartModalYes">Yes</button>
+                <button type="button" class="btn-modal btn-no" id="restartModalNo">Cancel</button>
+                <button type="button" class="btn-modal btn-yes" id="restartModalYes">Start over</button>
             </div>
         </div>
     </div>
@@ -150,9 +155,10 @@
     <!-- Congrats modal (all items done) -->
     <div class="modal-overlay" id="congratsModal" style="display: none;">
         <div class="modal">
-            <p class="modal-message modal-congrats">All the best for your trip!</p>
+            <p class="modal-message modal-congrats">You're all set</p>
+            <p class="modal-body">Your checklist is complete.</p>
             <div class="modal-buttons">
-                <button type="button" class="btn-modal btn-ok" id="congratsModalOk">OK</button>
+                <button type="button" class="btn-modal btn-ok" id="congratsModalOk">Done</button>
             </div>
         </div>
     </div>
