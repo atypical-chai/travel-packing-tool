@@ -204,7 +204,7 @@ header h1 {
     color: var(--color-text-secondary);
 }
 
-/* Checkbox group (who you're travelling with) */
+/* Checkbox group */
 .checkbox-group {
     display: flex;
     flex-wrap: wrap;
@@ -214,7 +214,7 @@ header h1 {
 .checkbox-label {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-md);
+    gap: 0;
     cursor: pointer;
     color: var(--color-text-secondary);
     font-weight: normal;
@@ -225,6 +225,7 @@ header h1 {
     width: 18px;
     height: 18px;
     margin: 0;
+    margin-right: 12px;
     flex-shrink: 0;
     align-self: center;
     accent-color: var(--color-accent);
@@ -709,6 +710,16 @@ button[type="submit"]:hover,
 
     #restartBtn {
         display: none;
+    }
+
+    /* Mobile: option groups in 2-column grid (basic checklist) */
+    #weatherGroup,
+    #gearGroup,
+    #activitiesGroup {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-sm);
+        align-items: center;
     }
 
     /* Mobile: delete as mild icon only – compact, secondary to checkbox & label */
