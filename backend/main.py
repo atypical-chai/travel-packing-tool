@@ -39,9 +39,11 @@ def root():
 def get_form_options():
     """Return dropdown/checkbox options for the trip form."""
     return FormOptionsResponse(
-        tripTypes=["trek", "leisure", "work", "backpacking"],
-        travelers=["me", "parents", "partner", "kids", "friends"],
-        seasons=["summer", "winter", "autumn", "spring"],
+        tripTypes=["general", "work", "outdoor", "roadtrip", "group"],
+        weather=["hot", "cold", "rain"],
+        gear=["laptop", "camera"],
+        activities=["beach", "fitness"],
+        tripScope=["domestic", "international"],
     )
 
 
@@ -50,8 +52,10 @@ def post_generate_checklist(body: TripDetailsRequest):
     """Generate personalized packing list from trip details."""
     result = generate_checklist(
         trip_type=body.tripType,
-        travelling_with=body.travellingWith,
-        season=body.season,
+        weather=body.weather or [],
+        gear=body.gear or [],
+        activities=body.activities or [],
+        trip_scope=body.tripScope or "domestic",
     )
     return ChecklistData(**result)
 

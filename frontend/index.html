@@ -30,36 +30,47 @@
             <form id="tripForm">
                 <div class="form-group">
                     <label for="destination">Destination:</label>
-                    <input type="text" id="destination" placeholder="e.g., Paris, France" required>
+                    <input type="text" id="destination" placeholder="e.g., Paris, Goa" required>
                 </div>
                 <div class="form-group">
-                    <label for="tripType">Trip Type:</label>
+                    <label for="tripType">What kind of trip is this?</label>
                     <select id="tripType" required>
                         <option value="">Select...</option>
-                        <option value="trek">Trek</option>
-                        <option value="leisure">Leisure</option>
-                        <option value="work">Work travel</option>
-                        <option value="backpacking">Backpacking</option>
+                        <option value="general">General trip</option>
+                        <option value="work">Workation</option>
+                        <option value="outdoor">Adventure / trek</option>
+                        <option value="roadtrip">Road trip</option>
+                        <option value="group">Group trip</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <span class="label">Who all are travelling (tick all that apply)</span>
-                    <div class="checkbox-group" id="travellingWithGroup">
-                        <label class="checkbox-label"><input type="checkbox" name="travellingWith" value="me"> Me</label>
-                        <label class="checkbox-label"><input type="checkbox" name="travellingWith" value="parents"> Parents</label>
-                        <label class="checkbox-label"><input type="checkbox" name="travellingWith" value="partner"> Partner</label>
-                        <label class="checkbox-label"><input type="checkbox" name="travellingWith" value="kids"> Kids</label>
-                        <label class="checkbox-label"><input type="checkbox" name="travellingWith" value="friends"> Friends</label>
+                    <span class="label">What weather do you expect? (tick all that apply)</span>
+                    <div class="checkbox-group" id="weatherGroup">
+                        <label class="checkbox-label"><input type="checkbox" name="weather" value="hot"> Hot</label>
+                        <label class="checkbox-label"><input type="checkbox" name="weather" value="cold"> Cold</label>
+                        <label class="checkbox-label"><input type="checkbox" name="weather" value="rain"> Rainy</label>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="season">Season of travelling:</label>
-                    <select id="season" required>
+                    <span class="label">What extra gear are you carrying? (tick all that apply)</span>
+                    <div class="checkbox-group" id="gearGroup">
+                        <label class="checkbox-label"><input type="checkbox" name="gear" value="laptop"> Laptop</label>
+                        <label class="checkbox-label"><input type="checkbox" name="gear" value="camera"> Camera gear</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <span class="label">Any planned activities? (tick all that apply)</span>
+                    <div class="checkbox-group" id="activitiesGroup">
+                        <label class="checkbox-label"><input type="checkbox" name="activities" value="beach"> Water activities (e.g. pool, beach)</label>
+                        <label class="checkbox-label"><input type="checkbox" name="activities" value="fitness"> Workout (e.g. run, gym)</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="tripScope">Is this a domestic or international trip?</label>
+                    <select id="tripScope" required>
                         <option value="">Select...</option>
-                        <option value="summer">Summer</option>
-                        <option value="winter">Winter</option>
-                        <option value="autumn">Autumn</option>
-                        <option value="spring">Spring</option>
+                        <option value="domestic">Domestic</option>
+                        <option value="international">International</option>
                     </select>
                 </div>
                 <button type="submit">Generate Checklist</button>

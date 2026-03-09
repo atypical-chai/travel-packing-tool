@@ -9,9 +9,11 @@ from typing import List
 class TripDetailsRequest(BaseModel):
     """What the frontend sends when generating a checklist."""
     destination: str
-    tripType: str
-    travellingWith: List[str]
-    season: str
+    tripType: str  # general | work | outdoor | roadtrip
+    weather: List[str]  # hot, cold, rain (checkboxes)
+    gear: List[str]  # laptop, camera (checkboxes)
+    activities: List[str]  # beach, fitness (checkboxes)
+    tripScope: str  # domestic | international
 
 
 class ChecklistItem(BaseModel):
@@ -30,5 +32,7 @@ class ChecklistData(BaseModel):
 class FormOptionsResponse(BaseModel):
     """Response: dropdown/checkbox options for the trip form."""
     tripTypes: List[str]
-    travelers: List[str]
-    seasons: List[str]
+    weather: List[str]
+    gear: List[str]
+    activities: List[str]
+    tripScope: List[str]

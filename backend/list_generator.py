@@ -5,17 +5,25 @@ Uses base + addons (tags) → query DB → dedupe → group by category → sort
 from database import get_items_by_tags
 
 
-def generate_checklist(trip_type, travelling_with, season):
+def generate_checklist(trip_type, weather, gear, activities, trip_scope):
     """
     Build tags from trip details, fetch matching items, dedupe, group, sort.
-    Returns: {"pack": [{"text": "...", "completed": false}, ...], "buy": [...], "do": [...]}
+    trip_type: general | work | outdoor | roadtrip (general adds no extra tag)
+    weather: list of hot, cold, rain
+    gear: list of laptop, camera
+    activities: list of beach, fitness
+    trip_scope: domestic | international (domestic adds no extra tag)
+    Returns: {"pack": [...], "buy": [...], "do": [...]}
     """
-    # 1. Build tags list: base + trip_type + travelers (exclude "me") + season
-    tags = ["base", trip_type]
-    for t in travelling_with:
-        if t != "me":
-            tags.append(t)
-    tags.append(season)
+    # 1. Build tags: base + trip_type (skip "general") + weather + gear + activities + international
+    tags = ["base"]
+    if trip_type and trip_type != "general":
+        tags.append(trip_type)
+    tags.extend(weather or [])
+    tags.extend(gear or [])
+    tags.extend(activities or [])
+    if trip_scope == "international":
+        tags.append("international")
 
     # 2. Query database for matching items
     matching = get_items_by_tags(tags)
@@ -46,38 +54,12 @@ def generate_checklist(trip_type, travelling_with, season):
 if __name__ == "__main__":
     # Test with different combinations
     test_cases = [
-        ("leisure", ["me"], "summer"),
-        ("trek", ["me", "partner", "kids"], "winter"),
+        ("general", [], [], [], "domestic"),
+        ("work", ["hot"], ["laptop"], [], "international"),
+        ("outdoor", ["cold", "rain"], [], ["fitness"], "domestic"),
     ]
-
-    for trip_type, travelling_with, season in test_cases:
-        tags = ["base", trip_type]
-        for t in travelling_with:
-            if t != "me":
-                tags.append(t)
-        tags.append(season)
-
-        print(f"\nGenerating checklist for tags: {tags}")
-
-        # Get raw count before deduplication
-        raw = get_items_by_tags(tags)
-        print(f"Found {len(raw)} items before deduplication")
-
-        result = generate_checklist(trip_type, travelling_with, season)
-        total_unique = len(result["pack"]) + len(result["buy"]) + len(result["do"])
-        print(f"After deduplication: {total_unique} unique items")
-
-        pack = len(result["pack"])
-        buy = len(result["buy"])
-        do = len(result["do"])
-        print(f"Final counts - Pack: {pack}, Buy: {buy}, Do: {do}")
-
-        # Sanity: trek should have hiking boots, kids should have diapers
-        if trip_type == "trek" and "kids" in travelling_with:
-            pack_texts = [x["text"] for x in result["pack"]]
-            if "Hiking boots" in pack_texts:
-                print("  [OK] Trek: Hiking boots present")
-            if "Diapers and wipes" in pack_texts:
-                print("  [OK] Kids: Diapers present")
-
-    print("\nDone.")
+    for trip_type, weather, gear, activities, trip_scope in test_cases:
+        result = generate_checklist(trip_type, weather, gear, activities, trip_scope)
+        total = len(result["pack"]) + len(result["buy"]) + len(result["do"])
+        print(f"trip_type={trip_type}, weather={weather}, gear={gear}, activities={activities}, scope={trip_scope} -> {total} items")
+    print("Done.")

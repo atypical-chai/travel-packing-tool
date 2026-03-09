@@ -4,12 +4,14 @@ const API_BASE_URL =
         ? 'http://127.0.0.1:8000'
         : 'https://travel-packing-tool-backend.onrender.com';
 
-// Trip data storage
+// Trip data storage (matches backend TripDetailsRequest)
 let tripData = {
     destination: '',
     tripType: '',
-    travellingWith: [],
-    season: ''
+    weather: [],
+    gear: [],
+    activities: [],
+    tripScope: ''
 };
 
 // Checklist data structure: just 3 lists. Content comes from backend (or hardcoded default for now).
@@ -51,8 +53,10 @@ async function loadChecklist() {
             body: JSON.stringify({
                 destination: tripData.destination,
                 tripType: tripData.tripType,
-                travellingWith: tripData.travellingWith,
-                season: tripData.season
+                weather: tripData.weather,
+                gear: tripData.gear,
+                activities: tripData.activities,
+                tripScope: tripData.tripScope
             })
         });
         if (!res.ok) throw new Error(`API ${res.status}`);
@@ -201,8 +205,10 @@ function confirmRestart() {
     hideRestartModal();
     tripData.destination = '';
     tripData.tripType = '';
-    tripData.travellingWith = [];
-    tripData.season = '';
+    tripData.weather = [];
+    tripData.gear = [];
+    tripData.activities = [];
+    tripData.tripScope = '';
     checklistData.pack = [];
     checklistData.buy = [];
     checklistData.do = [];
@@ -238,13 +244,15 @@ function handleTripSubmit(e) {
 
     tripData.destination = document.getElementById('destination').value.trim();
     tripData.tripType = document.getElementById('tripType').value;
-    tripData.travellingWith = Array.from(document.querySelectorAll('input[name="travellingWith"]:checked')).map(cb => cb.value);
-    tripData.season = document.getElementById('season').value;
+    tripData.weather = Array.from(document.querySelectorAll('input[name="weather"]:checked')).map(cb => cb.value);
+    tripData.gear = Array.from(document.querySelectorAll('input[name="gear"]:checked')).map(cb => cb.value);
+    tripData.activities = Array.from(document.querySelectorAll('input[name="activities"]:checked')).map(cb => cb.value);
+    tripData.tripScope = document.getElementById('tripScope').value;
 
-    const summaryParts = [tripData.destination, tripData.tripType, tripData.season];
-    if (tripData.travellingWith.length > 0) {
-        summaryParts.splice(2, 0, tripData.travellingWith.join(', '));
-    }
+    const summaryParts = [tripData.destination, tripData.tripType, tripData.tripScope];
+    if (tripData.weather.length > 0) summaryParts.push(tripData.weather.join(', '));
+    if (tripData.gear.length > 0) summaryParts.push(tripData.gear.join(', '));
+    if (tripData.activities.length > 0) summaryParts.push(tripData.activities.join(', '));
     const tripSummary = document.getElementById('tripSummary');
     tripSummary.textContent = summaryParts.join(' • ');
 
@@ -467,22 +475,24 @@ function loadSavedData() {
                 updateThemeToggleUI();
             }
 
-            if (!tripData.travellingWith) tripData.travellingWith = [];
-            if (!tripData.season) tripData.season = '';
+            if (!tripData.weather) tripData.weather = [];
+            if (!tripData.gear) tripData.gear = [];
+            if (!tripData.activities) tripData.activities = [];
 
             if (tripData.destination) {
                 document.getElementById('destination').value = tripData.destination;
                 document.getElementById('tripType').value = tripData.tripType || '';
-                document.getElementById('season').value = tripData.season || '';
-                const whoInputs = document.querySelectorAll('input[name="travellingWith"]');
-                whoInputs.forEach(inp => {
-                    inp.checked = (tripData.travellingWith || []).includes(inp.value);
+                document.getElementById('tripScope').value = tripData.tripScope || '';
+                ['weather', 'gear', 'activities'].forEach(name => {
+                    const inputs = document.querySelectorAll(`input[name="${name}"]`);
+                    const values = (tripData[name] || []);
+                    inputs.forEach(inp => { inp.checked = values.includes(inp.value); });
                 });
 
-                const summaryParts = [tripData.destination, tripData.tripType, tripData.season];
-                if ((tripData.travellingWith || []).length > 0) {
-                    summaryParts.splice(2, 0, tripData.travellingWith.join(', '));
-                }
+                const summaryParts = [tripData.destination, tripData.tripType, tripData.tripScope];
+                if ((tripData.weather || []).length > 0) summaryParts.push(tripData.weather.join(', '));
+                if ((tripData.gear || []).length > 0) summaryParts.push(tripData.gear.join(', '));
+                if ((tripData.activities || []).length > 0) summaryParts.push(tripData.activities.join(', '));
                 document.getElementById('tripSummary').textContent = summaryParts.join(' • ');
 
                 document.querySelector('.trip-details').style.display = 'none';

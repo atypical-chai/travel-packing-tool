@@ -69,6 +69,12 @@ ITEMS = [
     # --- Autumn/Spring (~2 items) ---
     {"name": "Umbrella", "category": "pack", "tags": ["autumn", "spring"]},
     {"name": "Light jacket", "category": "pack", "tags": ["autumn", "spring"]},
+    # --- Group trip ---
+    {"name": "Card games", "category": "pack", "tags": ["group"]},
+    {"name": "Speaker", "category": "pack", "tags": ["group"]},
+    {"name": "Set up group expenses", "category": "do", "tags": ["group"]},
+    # --- Camera gear (add-on for camera checkbox) ---
+    {"name": "Camera stand", "category": "pack", "tags": ["camera"]},
 ]
 
 if __name__ == "__main__":
