@@ -1,7 +1,7 @@
 """
 Seed data for the Travel Packing List backend.
 Items with category (pack/buy/do) and tags: base, work, outdoor, roadtrip, hot, cold, rain,
-laptop, camera, beach, fitness, international, group.
+laptop, camera, beach, fitness, international, downtime.
 Run this after database.py to populate items_master.
 """
 from database import init_database, seed_database
@@ -30,13 +30,14 @@ ITEMS = [
     {"name": "Power bank", "category": "pack", "tags": ["base", "camera"]},
     {"name": "Sunglasses", "category": "pack", "tags": ["base"]},
     {"name": "Earphones / headphones", "category": "pack", "tags": ["base"]},
-    {"name": "Books", "category": "pack", "tags": ["base"]},
-    {"name": "Speaker", "category": "pack", "tags": ["base", "group"]},
+    {"name": "Speaker", "category": "pack", "tags": ["base"]},
+    {"name": "Travel towel", "category": "pack", "tags": ["base"]},
+    {"name": "Wallet / cash", "category": "pack", "tags": ["base"]},
     # --- Base (buy) ---
     {"name": "Sanitiser", "category": "buy", "tags": ["base"]},
     {"name": "Bandages / basic first aid", "category": "buy", "tags": ["base"]},
     # --- Base (do) ---
-    {"name": "Check passport / ID", "category": "do", "tags": ["base"]},
+    {"name": "Keep valid photo ID handy", "category": "do", "tags": ["base"]},
     {"name": "Close / lock home", "category": "do", "tags": ["base"]},
     {"name": "Charge devices", "category": "do", "tags": ["base"]},
     {"name": "Download songs / movies for commute", "category": "do", "tags": ["base"]},
@@ -44,6 +45,7 @@ ITEMS = [
     # --- Work (Laptop & charger in laptop section with work tag) ---
     {"name": "Work clothes", "category": "pack", "tags": ["work"]},
     {"name": "Confirm work setup / internet if needed", "category": "do", "tags": ["work"]},
+    {"name": "Set out of office / out of station", "category": "do", "tags": ["work"]},
     # --- Outdoor / trek ---
     {"name": "Raincoat", "category": "pack", "tags": ["outdoor", "rain"]},
     {"name": "Trekking shoes", "category": "pack", "tags": ["outdoor"]},
@@ -53,24 +55,32 @@ ITEMS = [
     {"name": "Headlamp / torch", "category": "pack", "tags": ["outdoor"]},
     {"name": "Mosquito repellent", "category": "pack", "tags": ["outdoor"]},
     {"name": "Protein bars", "category": "buy", "tags": ["outdoor", "fitness"]},
-    # --- Road trip ---
+    # --- Road trip (planned activity) ---
     {"name": "Road trip snacks", "category": "buy", "tags": ["roadtrip"]},
     {"name": "Create road trip playlist", "category": "do", "tags": ["roadtrip"]},
     {"name": "Fuel up your car", "category": "do", "tags": ["roadtrip"]},
     {"name": "Confirm car rental / cab booking if needed", "category": "do", "tags": ["roadtrip"]},
+    {"name": "Download offline maps", "category": "do", "tags": ["roadtrip"]},
     # --- Hot ---
     {"name": "Shorts", "category": "pack", "tags": ["hot"]},
     {"name": "Hat / cap", "category": "pack", "tags": ["hot"]},
+    {"name": "Deodorant", "category": "pack", "tags": ["hot"]},
+    {"name": "Small towel / handkerchief", "category": "pack", "tags": ["hot"]},
     # --- Cold ---
     {"name": "Jacket / hoodie", "category": "pack", "tags": ["cold"]},
     {"name": "Woolen socks", "category": "pack", "tags": ["cold"]},
     {"name": "Thermals / body warmers", "category": "pack", "tags": ["cold"]},
     {"name": "Warm layers", "category": "pack", "tags": ["cold"]},
+    {"name": "Gloves", "category": "pack", "tags": ["cold"]},
+    {"name": "Scarf", "category": "pack", "tags": ["cold"]},
+    {"name": "Winter cap / beanie", "category": "pack", "tags": ["cold"]},
     # --- Rain (Raincoat, Waterproof bag, Polythene bags already in outdoor) ---
     {"name": "Quick-dry clothes", "category": "pack", "tags": ["rain"]},
+    {"name": "Umbrella", "category": "pack", "tags": ["rain"]},
     # --- Laptop (extra gear; also used by work) ---
     {"name": "Laptop", "category": "pack", "tags": ["work", "laptop"]},
     {"name": "Laptop charger", "category": "pack", "tags": ["work", "laptop"]},
+    {"name": "Laptop sleeve / bag", "category": "pack", "tags": ["laptop"]},
     # --- Camera gear ---
     {"name": "Camera", "category": "pack", "tags": ["camera"]},
     {"name": "Memory card", "category": "pack", "tags": ["camera"]},
@@ -91,9 +101,12 @@ ITEMS = [
     {"name": "Check passport validity", "category": "do", "tags": ["international"]},
     {"name": "Arrange currency exchange", "category": "do", "tags": ["international"]},
     {"name": "Arrange international driving permit if needed", "category": "do", "tags": ["international"]},
-    # --- Group trip (Speaker already in base with group tag) ---
-    {"name": "Card games", "category": "pack", "tags": ["group"]},
-    {"name": "Set up group expenses", "category": "do", "tags": ["group"]},
+    {"name": "Arrange eSIM / local SIM or roaming", "category": "do", "tags": ["international"]},
+    {"name": "Check visa requirements", "category": "do", "tags": ["international"]},
+    # --- Downtime (planned activity) ---
+    {"name": "Books", "category": "pack", "tags": ["downtime"]},
+    {"name": "Journaling", "category": "pack", "tags": ["downtime"]},
+    {"name": "Art kit", "category": "pack", "tags": ["downtime"]},
 ]
 
 if __name__ == "__main__":
