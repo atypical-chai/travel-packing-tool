@@ -40,7 +40,7 @@ def get_form_options():
     """Return dropdown/checkbox options for the trip form."""
     return FormOptionsResponse(
         tripTypes=["general", "work", "outdoor"],
-        weather=["hot", "cold", "rain"],
+        weather=["hot", "cold", "rain", "pleasant"],
         gear=["laptop", "camera"],
         activities=["beach", "fitness", "roadtrip", "downtime"],
         tripScope=["domestic", "international"],
