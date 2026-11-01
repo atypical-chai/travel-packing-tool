@@ -1,7 +1,8 @@
 # Handoff — travel-packing-tool AWS pilot (present)
 
 **Updated:** 2026-11-01  
-**Status:** Staging live on AWS. Vercel + Render still untouched for production traffic.
+**Status:** Staging live on AWS. Vercel + Render still untouched for production traffic.  
+**Code PR (not required for already-deployed staging):** https://github.com/atypical-chai/travel-packing-tool/pull/1
 
 ## Live URLs
 | Role | URL |
