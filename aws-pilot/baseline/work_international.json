@@ -1,0 +1,215 @@
+{
+  "status": 200,
+  "body": {
+    "pack": [
+      {
+        "text": "Belt",
+        "completed": false
+      },
+      {
+        "text": "Body wash / soap",
+        "completed": false
+      },
+      {
+        "text": "Bottom wear",
+        "completed": false
+      },
+      {
+        "text": "Comb / hair brush",
+        "completed": false
+      },
+      {
+        "text": "Deodorant",
+        "completed": false
+      },
+      {
+        "text": "Earphones / headphones",
+        "completed": false
+      },
+      {
+        "text": "Face wash",
+        "completed": false
+      },
+      {
+        "text": "Hat / cap",
+        "completed": false
+      },
+      {
+        "text": "Laptop",
+        "completed": false
+      },
+      {
+        "text": "Laptop charger",
+        "completed": false
+      },
+      {
+        "text": "Laptop sleeve / bag",
+        "completed": false
+      },
+      {
+        "text": "Main shoes",
+        "completed": false
+      },
+      {
+        "text": "Medications",
+        "completed": false
+      },
+      {
+        "text": "Moisturiser",
+        "completed": false
+      },
+      {
+        "text": "Passport",
+        "completed": false
+      },
+      {
+        "text": "Phone charger",
+        "completed": false
+      },
+      {
+        "text": "Power bank",
+        "completed": false
+      },
+      {
+        "text": "Sandals / home footwear",
+        "completed": false
+      },
+      {
+        "text": "Serum",
+        "completed": false
+      },
+      {
+        "text": "Shampoo",
+        "completed": false
+      },
+      {
+        "text": "Shorts",
+        "completed": false
+      },
+      {
+        "text": "Sleeping wear",
+        "completed": false
+      },
+      {
+        "text": "Small towel / handkerchief",
+        "completed": false
+      },
+      {
+        "text": "Socks",
+        "completed": false
+      },
+      {
+        "text": "Speaker",
+        "completed": false
+      },
+      {
+        "text": "Sunglasses",
+        "completed": false
+      },
+      {
+        "text": "Sunscreen",
+        "completed": false
+      },
+      {
+        "text": "Toothbrush",
+        "completed": false
+      },
+      {
+        "text": "Toothpaste",
+        "completed": false
+      },
+      {
+        "text": "Travel cards / lounge card",
+        "completed": false
+      },
+      {
+        "text": "Travel towel",
+        "completed": false
+      },
+      {
+        "text": "Undergarments",
+        "completed": false
+      },
+      {
+        "text": "Upper wear",
+        "completed": false
+      },
+      {
+        "text": "Wallet / cash",
+        "completed": false
+      },
+      {
+        "text": "Work clothes",
+        "completed": false
+      }
+    ],
+    "buy": [
+      {
+        "text": "Bandages / basic first aid",
+        "completed": false
+      },
+      {
+        "text": "Currency exchange / forex",
+        "completed": false
+      },
+      {
+        "text": "Sanitiser",
+        "completed": false
+      },
+      {
+        "text": "Travel adapter",
+        "completed": false
+      }
+    ],
+    "do": [
+      {
+        "text": "Arrange currency exchange",
+        "completed": false
+      },
+      {
+        "text": "Arrange eSIM / local SIM or roaming",
+        "completed": false
+      },
+      {
+        "text": "Arrange international driving permit if needed",
+        "completed": false
+      },
+      {
+        "text": "Charge devices",
+        "completed": false
+      },
+      {
+        "text": "Check passport validity",
+        "completed": false
+      },
+      {
+        "text": "Check visa requirements",
+        "completed": false
+      },
+      {
+        "text": "Close / lock home",
+        "completed": false
+      },
+      {
+        "text": "Confirm hotel booking",
+        "completed": false
+      },
+      {
+        "text": "Confirm work setup / internet if needed",
+        "completed": false
+      },
+      {
+        "text": "Download songs / movies for commute",
+        "completed": false
+      },
+      {
+        "text": "Keep valid photo ID handy",
+        "completed": false
+      },
+      {
+        "text": "Set out of office / out of station",
+        "completed": false
+      }
+    ]
+  }
+}

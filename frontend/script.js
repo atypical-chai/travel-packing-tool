@@ -1,8 +1,16 @@
-// Backend API: local when served from localhost, otherwise deployed (Render)
-const API_BASE_URL =
-    (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
-        ? 'http://127.0.0.1:8000'
-        : 'https://travel-packing-tool-backend.onrender.com';
+// Backend API base URL.
+// Priority: window.TRAVEL_PACKING_API_BASE_URL (from config.js on AWS) →
+// local uvicorn on localhost → Render (current production API).
+function resolveApiBaseUrl() {
+    if (typeof window !== 'undefined' && window.TRAVEL_PACKING_API_BASE_URL) {
+        return String(window.TRAVEL_PACKING_API_BASE_URL).replace(/\/$/, '');
+    }
+    if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+        return 'http://127.0.0.1:8000';
+    }
+    return 'https://travel-packing-tool-backend.onrender.com';
+}
+const API_BASE_URL = resolveApiBaseUrl();
 
 // Display labels for trip type (summary shows these, not raw values)
 const TRIP_TYPE_LABELS = { general: 'Vacation', work: 'Workation', outdoor: 'Adventure' };

@@ -1,0 +1,41 @@
+{
+  "root": {
+    "status": 200,
+    "counts": null
+  },
+  "form_options": {
+    "status": 200,
+    "counts": null
+  },
+  "vacation_domestic": {
+    "status": 200,
+    "counts": {
+      "pack": 25,
+      "buy": 2,
+      "do": 5,
+      "total": 32
+    }
+  },
+  "work_international": {
+    "status": 200,
+    "counts": {
+      "pack": 35,
+      "buy": 4,
+      "do": 12,
+      "total": 51
+    }
+  },
+  "outdoor_cold_rain": {
+    "status": 200,
+    "counts": {
+      "pack": 44,
+      "buy": 3,
+      "do": 5,
+      "total": 52
+    }
+  },
+  "invalid_trip_type": {
+    "status": 422,
+    "counts": null
+  }
+}

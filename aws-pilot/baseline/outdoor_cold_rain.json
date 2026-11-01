@@ -1,0 +1,219 @@
+{
+  "status": 200,
+  "body": {
+    "pack": [
+      {
+        "text": "Belt",
+        "completed": false
+      },
+      {
+        "text": "Body wash / soap",
+        "completed": false
+      },
+      {
+        "text": "Bottom wear",
+        "completed": false
+      },
+      {
+        "text": "Comb / hair brush",
+        "completed": false
+      },
+      {
+        "text": "Earphones / headphones",
+        "completed": false
+      },
+      {
+        "text": "Face wash",
+        "completed": false
+      },
+      {
+        "text": "Gloves",
+        "completed": false
+      },
+      {
+        "text": "Headlamp / torch",
+        "completed": false
+      },
+      {
+        "text": "Jacket / hoodie",
+        "completed": false
+      },
+      {
+        "text": "Main shoes",
+        "completed": false
+      },
+      {
+        "text": "Medications",
+        "completed": false
+      },
+      {
+        "text": "Moisturiser",
+        "completed": false
+      },
+      {
+        "text": "Mosquito repellent",
+        "completed": false
+      },
+      {
+        "text": "Phone charger",
+        "completed": false
+      },
+      {
+        "text": "Polythene bags / wet bags",
+        "completed": false
+      },
+      {
+        "text": "Power bank",
+        "completed": false
+      },
+      {
+        "text": "Quick-dry clothes",
+        "completed": false
+      },
+      {
+        "text": "Raincoat",
+        "completed": false
+      },
+      {
+        "text": "Regular carry bag",
+        "completed": false
+      },
+      {
+        "text": "Sandals / home footwear",
+        "completed": false
+      },
+      {
+        "text": "Scarf",
+        "completed": false
+      },
+      {
+        "text": "Serum",
+        "completed": false
+      },
+      {
+        "text": "Shampoo",
+        "completed": false
+      },
+      {
+        "text": "Sleeping wear",
+        "completed": false
+      },
+      {
+        "text": "Socks",
+        "completed": false
+      },
+      {
+        "text": "Speaker",
+        "completed": false
+      },
+      {
+        "text": "Sports shoes",
+        "completed": false
+      },
+      {
+        "text": "Sunglasses",
+        "completed": false
+      },
+      {
+        "text": "Sunscreen",
+        "completed": false
+      },
+      {
+        "text": "Thermals / body warmers",
+        "completed": false
+      },
+      {
+        "text": "Toothbrush",
+        "completed": false
+      },
+      {
+        "text": "Toothpaste",
+        "completed": false
+      },
+      {
+        "text": "Towel",
+        "completed": false
+      },
+      {
+        "text": "Travel towel",
+        "completed": false
+      },
+      {
+        "text": "Trekking shoes",
+        "completed": false
+      },
+      {
+        "text": "Umbrella",
+        "completed": false
+      },
+      {
+        "text": "Undergarments",
+        "completed": false
+      },
+      {
+        "text": "Upper wear",
+        "completed": false
+      },
+      {
+        "text": "Wallet / cash",
+        "completed": false
+      },
+      {
+        "text": "Warm layers",
+        "completed": false
+      },
+      {
+        "text": "Waterproof bag",
+        "completed": false
+      },
+      {
+        "text": "Winter cap / beanie",
+        "completed": false
+      },
+      {
+        "text": "Woolen socks",
+        "completed": false
+      },
+      {
+        "text": "Workout clothes",
+        "completed": false
+      }
+    ],
+    "buy": [
+      {
+        "text": "Bandages / basic first aid",
+        "completed": false
+      },
+      {
+        "text": "Protein bars",
+        "completed": false
+      },
+      {
+        "text": "Sanitiser",
+        "completed": false
+      }
+    ],
+    "do": [
+      {
+        "text": "Charge devices",
+        "completed": false
+      },
+      {
+        "text": "Close / lock home",
+        "completed": false
+      },
+      {
+        "text": "Confirm hotel booking",
+        "completed": false
+      },
+      {
+        "text": "Download songs / movies for commute",
+        "completed": false
+      },
+      {
+        "text": "Keep valid photo ID handy",
+        "completed": false
+      }
+    ]
+  }
+}
