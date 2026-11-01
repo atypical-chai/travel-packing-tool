@@ -11,9 +11,19 @@ _this_dir = os.path.dirname(os.path.abspath(__file__))
 DB_DIR = os.path.join(_this_dir, "database")
 DB_PATH = os.path.join(DB_DIR, "items.db")
 
+# Lambda's deployed code filesystem is read-only. When READ_ONLY_DB=1 we never
+# create folders and we open the packaged catalog as an immutable URI.
+READ_ONLY_DB = os.environ.get("READ_ONLY_DB", "").strip() in {"1", "true", "TRUE", "yes"}
+
 
 def get_db_connection():
-    """Connect to the SQLite database. Creates the database folder if it doesn't exist."""
+    """Connect to the SQLite catalog. Read-only on Lambda; local/dev may create the folder."""
+    if READ_ONLY_DB:
+        if not os.path.exists(DB_PATH):
+            raise FileNotFoundError(f"Packaged catalog missing: {DB_PATH}")
+        # Immutable open — safe on Lambda's read-only code directory.
+        return sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
+
     os.makedirs(DB_DIR, exist_ok=True)
     return sqlite3.connect(DB_PATH)
 

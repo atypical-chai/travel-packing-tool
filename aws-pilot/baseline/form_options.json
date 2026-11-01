@@ -1,0 +1,30 @@
+{
+  "status": 200,
+  "body": {
+    "tripTypes": [
+      "general",
+      "work",
+      "outdoor"
+    ],
+    "weather": [
+      "hot",
+      "cold",
+      "rain",
+      "pleasant"
+    ],
+    "gear": [
+      "laptop",
+      "camera"
+    ],
+    "activities": [
+      "beach",
+      "fitness",
+      "roadtrip",
+      "downtime"
+    ],
+    "tripScope": [
+      "domestic",
+      "international"
+    ]
+  }
+}

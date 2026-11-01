@@ -1,7 +1,11 @@
 """
 FastAPI app: API server for the Travel Packing List.
 Endpoints: GET /, GET /api/form-options, POST /api/generate-checklist.
+
+On AWS Lambda, Mangum adapts API Gateway events to ASGI (handler below).
 """
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -10,15 +14,32 @@ from list_generator import generate_checklist
 
 app = FastAPI(title="Travel Packing List API")
 
-# Allow frontend: local dev + Vercel production
+# Exact origins only. Override with comma-separated CORS_ORIGINS for AWS staging.
+_DEFAULT_ORIGINS = [
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+    "https://travel-packing-tool.vercel.app",
+    # AWS staging CloudFront (pilot). Exact origin; keep Vercel for rollback.
+    "https://d1ygtemkaj8b77.cloudfront.net",
+    "null",
+]
+
+
+def _cors_origins():
+    raw = os.environ.get("CORS_ORIGINS", "").strip()
+    if not raw:
+        return list(_DEFAULT_ORIGINS)
+    origins = [part.strip() for part in raw.split(",") if part.strip()]
+    # Keep local + Vercel during the dual-host pilot so rollbacks stay usable.
+    for origin in _DEFAULT_ORIGINS:
+        if origin not in origins:
+            origins.append(origin)
+    return origins
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5500",
-        "http://127.0.0.1:5500",
-        "https://travel-packing-tool.vercel.app",
-        "null",
-    ],
+    allow_origins=_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -60,9 +81,18 @@ def post_generate_checklist(body: TripDetailsRequest):
     return ChecklistData(**result)
 
 
+# AWS Lambda entrypoint (unused on Render / local uvicorn).
+try:
+    from mangum import Mangum
+
+    handler = Mangum(app, lifespan="off")
+except ImportError:  # pragma: no cover - Render/local without mangum installed
+    handler = None
+
+
 if __name__ == "__main__":
     """Run with: python main.py (reads PORT from env for Render)."""
-    import os
     import uvicorn
+
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)

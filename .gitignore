@@ -29,5 +29,8 @@ TODO-polish.md
 debug.log
 debug*.log
 
+# AWS pilot build artifacts (zips, staged frontend)
+infra/.build/
+
 # Optional: uncomment if you use Node/npm for frontend tooling later
 # node_modules/

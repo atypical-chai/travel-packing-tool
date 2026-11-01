@@ -1,0 +1,55 @@
+{
+  "status": 422,
+  "body": {
+    "detail": [
+      {
+        "type": "missing",
+        "loc": [
+          "body",
+          "weather"
+        ],
+        "msg": "Field required",
+        "input": {
+          "destination": "",
+          "tripType": "not-a-type"
+        }
+      },
+      {
+        "type": "missing",
+        "loc": [
+          "body",
+          "gear"
+        ],
+        "msg": "Field required",
+        "input": {
+          "destination": "",
+          "tripType": "not-a-type"
+        }
+      },
+      {
+        "type": "missing",
+        "loc": [
+          "body",
+          "activities"
+        ],
+        "msg": "Field required",
+        "input": {
+          "destination": "",
+          "tripType": "not-a-type"
+        }
+      },
+      {
+        "type": "missing",
+        "loc": [
+          "body",
+          "tripScope"
+        ],
+        "msg": "Field required",
+        "input": {
+          "destination": "",
+          "tripType": "not-a-type"
+        }
+      }
+    ]
+  }
+}

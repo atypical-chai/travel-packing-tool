@@ -1,0 +1,87 @@
+name: Deploy AWS staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: "infra | frontend-render | backend | frontend-aws-api | all"
+        required: true
+        default: all
+  push:
+    branches: [master]
+    paths:
+      - "frontend/**"
+      - "backend/**"
+      - "infra/**"
+      - ".github/workflows/deploy-aws-staging.yml"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+    environment: aws-staging
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install backend deps for local import checks
+        run: |
+          python3 -m pip install -r backend/requirements.txt
+          python3 -c "import sys; sys.path.insert(0,'backend'); import main; assert main.handler is not None"
+
+      - name: Unit check checklist generation vs baseline counts
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          from pathlib import Path
+          sys.path.insert(0, "backend")
+          from list_generator import generate_checklist
+          cases = {
+            "vacation_domestic": ("general", [], [], [], "domestic"),
+            "work_international": ("work", ["hot"], ["laptop"], [], "international"),
+            "outdoor_cold_rain": ("outdoor", ["cold", "rain"], [], ["fitness"], "domestic"),
+          }
+          base = Path("aws-pilot/baseline")
+          for name, args in cases.items():
+            expected = json.loads((base/f"{name}.json").read_text())["body"]
+            actual = generate_checklist(*args)
+            for key in ("pack", "buy", "do"):
+              exp = sorted(i["text"] for i in expected[key])
+              act = sorted(i["text"] for i in actual[key])
+              assert exp == act, (name, key, exp, act)
+          print("local checklist fixtures OK")
+          PY
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: us-west-2
+
+      - name: Deploy selected phase
+        run: python3 infra/deploy.py --phase ${{ github.event.inputs.phase || 'all' }} --budget-email ${{ secrets.BUDGET_EMAIL || 'ambujsriv@gmail.com' }}
+
+      - name: Compare AWS API to baseline
+        if: ${{ github.event.inputs.phase == 'all' || github.event.inputs.phase == 'backend' || github.event.inputs.phase == '' || github.event_name == 'push' }}
+        run: |
+          API=$(python3 -c "import json; print(json.load(open('aws-pilot/staging-outputs.json'))['ApiEndpoint'])")
+          python3 infra/compare_api.py --base-url "$API"
+
+      - name: Smoke frontend
+        if: ${{ github.event.inputs.phase != 'infra' && github.event.inputs.phase != 'backend' }}
+        run: |
+          python3 - <<'PY'
+          import json, subprocess, sys
+          out = json.load(open("aws-pilot/staging-outputs.json"))
+          expect = out.get("FrontendApiBaseUrl") or out["ApiEndpoint"]
+          raise SystemExit(subprocess.call([sys.executable, "infra/smoke_frontend.py", "--base-url", out["CloudFrontUrl"], "--expect-api", expect]))
+          PY

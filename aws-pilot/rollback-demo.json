@@ -1,0 +1,13 @@
+{
+  "frontendPreviousVersionId": "27HCHdOJ2TttbVxEF3XO_hyPsqwo8AmD",
+  "frontendSecondReleaseVersionId": "cyGuEXDxDarVgUBXIR83Q.yMjUYDiQeT",
+  "frontendRolledBack": true,
+  "lambdaVersionsBefore": [
+    [
+      "1",
+      "pilot-1793561711"
+    ]
+  ],
+  "lambdaPublishedDuringDemo": "1",
+  "lambdaStagingAliasVersion": "1"
+}
